@@ -350,8 +350,6 @@ const Adoptions = () => {
 
       <AdoptionDetailDialog listing={detailCat} open={!!detailCat} onOpenChange={(o) => !o && setDetailCat(null)} />
     </div>
-    </div>
-  );
 };
 
 export default Adoptions;
