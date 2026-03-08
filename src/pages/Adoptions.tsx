@@ -62,23 +62,23 @@ const Adoptions = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("adoption_listings")
-        .select("*, profiles!adoption_listings_user_id_fkey(display_name, avatar_url)")
+        .select("*")
         .eq("status", "available")
         .order("created_at", { ascending: false });
-      if (error) {
-        // Fallback without join if FK doesn't exist
-        const { data: fallback, error: err2 } = await supabase
-          .from("adoption_listings")
-          .select("*")
-          .eq("status", "available")
-          .order("created_at", { ascending: false });
-        if (err2) throw err2;
-        return (fallback || []).map((r: any) => ({ ...r, poster_name: null, poster_avatar: null })) as AdoptionListing[];
-      }
-      return (data || []).map((r: any) => ({
+      if (error) throw error;
+      if (!data || data.length === 0) return [] as AdoptionListing[];
+      
+      const userIds = [...new Set(data.map((r) => r.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", userIds);
+      
+      const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
+      return data.map((r) => ({
         ...r,
-        poster_name: r.profiles?.display_name ?? null,
-        poster_avatar: r.profiles?.avatar_url ?? null,
+        poster_name: profileMap.get(r.user_id)?.display_name ?? null,
+        poster_avatar: profileMap.get(r.user_id)?.avatar_url ?? null,
       })) as AdoptionListing[];
     },
   });
@@ -377,7 +377,15 @@ const Adoptions = () => {
                 <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                   <MapPin size={12} /> {cat.location}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">📞 {cat.contact_info}</p>
+                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
+                  <Avatar className="h-5 w-5">
+                    <AvatarImage src={cat.poster_avatar ?? undefined} />
+                    <AvatarFallback className="text-[10px] bg-secondary text-secondary-foreground">
+                      {(cat.poster_name ?? "?")[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-xs text-muted-foreground truncate">{cat.poster_name ?? "Anonymous"}</span>
+                </div>
               </CardContent>
               {user?.id === cat.user_id && (
                 <CardFooter className="pt-0">
