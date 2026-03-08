@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Heart, MapPin, Plus, Trash2, Upload, Search, X } from "lucide-react";
+import AdoptionDetailDialog from "@/components/AdoptionDetailDialog";
 
 interface AdoptionListing {
   id: string;
@@ -33,6 +34,7 @@ const Adoptions = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [detailCat, setDetailCat] = useState<AdoptionListing | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterGender, setFilterGender] = useState("all");
   const [filterBreed, setFilterBreed] = useState("all");
@@ -306,7 +308,7 @@ const Adoptions = () => {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((cat) => (
-            <Card key={cat.id} className="overflow-hidden hover:shadow-hover transition-shadow group">
+            <Card key={cat.id} className="overflow-hidden hover:shadow-hover transition-shadow group cursor-pointer" onClick={() => setDetailCat(cat)}>
               <div className="relative h-52 bg-muted">
                 {cat.image_url ? (
                   <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
