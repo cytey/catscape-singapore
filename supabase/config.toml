@@ -1,1 +1,4 @@
 project_id = "gsghvaqfekboykprpxjo"
+
+[functions.cat-verter]
+verify_jwt = false

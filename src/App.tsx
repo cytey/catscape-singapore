@@ -14,6 +14,7 @@ import Guides from "./pages/Guides";
 import Services from "./pages/Services";
 import CommunityCats from "./pages/CommunityCats";
 import Auth from "./pages/Auth";
+import CatVerter from "./pages/CatVerter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/guides" element={<Guides />} />
               <Route path="/services" element={<Services />} />
               <Route path="/community-cats" element={<CommunityCats />} />
+              <Route path="/cat-verter" element={<CatVerter />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

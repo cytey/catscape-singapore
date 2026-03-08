@@ -12,6 +12,7 @@ const navItems = [
   { path: "/dictionary", label: "📖 Meow-tionary" },
   { path: "/news", label: "📰 Cat-ch Up" },
   { path: "/guides", label: "📚 Purr-fect Tips" },
+  { path: "/cat-verter", label: "🔄 Cat-verter" },
   { path: "/services", label: "🏥 Cat Care Hub" },
 ];
 
