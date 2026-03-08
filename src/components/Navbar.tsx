@@ -47,12 +47,24 @@ const Navbar = () => {
               </Link>
             ))}
             {user ? (
-              <button
-                onClick={() => signOut()}
-                className="ml-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all inline-flex items-center gap-1"
-              >
-                <LogOut size={16} /> Sign Out
-              </button>
+              <div className="ml-2 flex items-center gap-1">
+                <Link
+                  to="/profile"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all inline-flex items-center gap-1 ${
+                    location.pathname === "/profile"
+                      ? "bg-primary text-primary-foreground shadow-soft"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <User size={16} /> Profile
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all inline-flex items-center gap-1"
+                >
+                  <LogOut size={16} /> Sign Out
+                </button>
+              </div>
             ) : (
               <Link
                 to="/auth"
@@ -88,12 +100,25 @@ const Navbar = () => {
                 </Link>
               ))}
               {user ? (
-                <button
-                  onClick={() => { signOut(); setIsOpen(false); }}
-                  className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary text-left inline-flex items-center gap-2"
-                >
-                  <LogOut size={16} /> Sign Out
-                </button>
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all inline-flex items-center gap-2 ${
+                      location.pathname === "/profile"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <User size={16} /> My Purr-ofile
+                  </Link>
+                  <button
+                    onClick={() => { signOut(); setIsOpen(false); }}
+                    className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary text-left inline-flex items-center gap-2"
+                  >
+                    <LogOut size={16} /> Sign Out
+                  </button>
+                </>
               ) : (
                 <Link to="/auth" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-lg bg-gradient-hero text-primary-foreground text-sm font-bold text-center">
                   🐾 Sign In / Join
