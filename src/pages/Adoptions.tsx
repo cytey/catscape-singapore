@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +30,8 @@ interface AdoptionListing {
   contact_info: string;
   status: string;
   created_at: string;
+  poster_name: string | null;
+  poster_avatar: string | null;
 }
 
 const Adoptions = () => {
@@ -59,11 +62,24 @@ const Adoptions = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("adoption_listings")
-        .select("*")
+        .select("*, profiles!adoption_listings_user_id_fkey(display_name, avatar_url)")
         .eq("status", "available")
         .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as AdoptionListing[];
+      if (error) {
+        // Fallback without join if FK doesn't exist
+        const { data: fallback, error: err2 } = await supabase
+          .from("adoption_listings")
+          .select("*")
+          .eq("status", "available")
+          .order("created_at", { ascending: false });
+        if (err2) throw err2;
+        return (fallback || []).map((r: any) => ({ ...r, poster_name: null, poster_avatar: null })) as AdoptionListing[];
+      }
+      return (data || []).map((r: any) => ({
+        ...r,
+        poster_name: r.profiles?.display_name ?? null,
+        poster_avatar: r.profiles?.avatar_url ?? null,
+      })) as AdoptionListing[];
     },
   });
 
