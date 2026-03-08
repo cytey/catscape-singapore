@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Heart, MapPin, Plus, Trash2, Upload, Search, X } from "lucide-react";
+import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star } from "lucide-react";
 import AdoptionDetailDialog from "@/components/AdoptionDetailDialog";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface AdoptionListing {
   id: string;
@@ -40,6 +41,8 @@ const Adoptions = () => {
   const [filterGender, setFilterGender] = useState("all");
   const [filterBreed, setFilterBreed] = useState("all");
   const [filterLocation, setFilterLocation] = useState("all");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { isFavorite, toggleFavorite, favoriteIds } = useFavorites();
   const [form, setForm] = useState({
     name: "",
     breed: "",
@@ -79,17 +82,19 @@ const Adoptions = () => {
       const matchesGender = filterGender === "all" || cat.gender === filterGender;
       const matchesBreed = filterBreed === "all" || cat.breed === filterBreed;
       const matchesLocation = filterLocation === "all" || cat.location === filterLocation;
-      return matchesSearch && matchesGender && matchesBreed && matchesLocation;
+      const matchesFavorites = !showFavoritesOnly || favoriteIds.includes(cat.id);
+      return matchesSearch && matchesGender && matchesBreed && matchesLocation && matchesFavorites;
     });
-  }, [listings, searchQuery, filterGender, filterBreed, filterLocation]);
+  }, [listings, searchQuery, filterGender, filterBreed, filterLocation, showFavoritesOnly, favoriteIds]);
 
-  const hasActiveFilters = searchQuery || filterGender !== "all" || filterBreed !== "all" || filterLocation !== "all";
+  const hasActiveFilters = searchQuery || filterGender !== "all" || filterBreed !== "all" || filterLocation !== "all" || showFavoritesOnly;
 
   const clearFilters = () => {
     setSearchQuery("");
     setFilterGender("all");
     setFilterBreed("all");
     setFilterLocation("all");
+    setShowFavoritesOnly(false);
   };
 
   const addMutation = useMutation({
@@ -270,6 +275,17 @@ const Adoptions = () => {
               ))}
             </SelectContent>
           </Select>
+          {user && (
+            <Button
+              variant={showFavoritesOnly ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFavoritesOnly((v) => !v)}
+              className={showFavoritesOnly ? "bg-primary text-primary-foreground" : ""}
+            >
+              <Star size={14} className={`mr-1 ${showFavoritesOnly ? "fill-current" : ""}`} />
+              Favorites{favoriteIds.length > 0 ? ` (${favoriteIds.length})` : ""}
+            </Button>
+          )}
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
               <X size={14} className="mr-1" /> Clear
@@ -323,6 +339,15 @@ const Adoptions = () => {
                   <div className="w-full h-full flex items-center justify-center text-5xl">🐱</div>
                 )}
                 <Badge className="absolute top-2 right-2 bg-primary/90 text-primary-foreground">{genderLabel(cat.gender)}</Badge>
+                {user && (
+                  <button
+                    className={`absolute top-2 left-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors ${isFavorite(cat.id) ? "text-primary" : "text-muted-foreground"}`}
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite.mutate(cat.id); }}
+                    aria-label={isFavorite(cat.id) ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <Star size={16} className={isFavorite(cat.id) ? "fill-current" : ""} />
+                  </button>
+                )}
               </div>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{cat.name}</CardTitle>
