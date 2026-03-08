@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Heart, MapPin, Plus, Trash2, Upload } from "lucide-react";
+import { Heart, MapPin, Plus, Trash2, Upload, Search, X } from "lucide-react";
 
 interface AdoptionListing {
   id: string;
@@ -33,6 +33,10 @@ const Adoptions = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterGender, setFilterGender] = useState("all");
+  const [filterBreed, setFilterBreed] = useState("all");
+  const [filterLocation, setFilterLocation] = useState("all");
   const [form, setForm] = useState({
     name: "",
     breed: "",
@@ -56,6 +60,34 @@ const Adoptions = () => {
       return data as AdoptionListing[];
     },
   });
+
+  const uniqueBreeds = useMemo(() => [...new Set(listings.map((c) => c.breed).filter(Boolean))].sort(), [listings]);
+  const uniqueLocations = useMemo(() => [...new Set(listings.map((c) => c.location).filter(Boolean))].sort(), [listings]);
+
+  const filtered = useMemo(() => {
+    return listings.filter((cat) => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        !q ||
+        cat.name.toLowerCase().includes(q) ||
+        cat.breed?.toLowerCase().includes(q) ||
+        cat.location.toLowerCase().includes(q) ||
+        cat.description?.toLowerCase().includes(q);
+      const matchesGender = filterGender === "all" || cat.gender === filterGender;
+      const matchesBreed = filterBreed === "all" || cat.breed === filterBreed;
+      const matchesLocation = filterLocation === "all" || cat.location === filterLocation;
+      return matchesSearch && matchesGender && matchesBreed && matchesLocation;
+    });
+  }, [listings, searchQuery, filterGender, filterBreed, filterLocation]);
+
+  const hasActiveFilters = searchQuery || filterGender !== "all" || filterBreed !== "all" || filterLocation !== "all";
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setFilterGender("all");
+    setFilterBreed("all");
+    setFilterLocation("all");
+  };
 
   const addMutation = useMutation({
     mutationFn: async () => {
@@ -196,6 +228,53 @@ const Adoptions = () => {
         )}
       </div>
 
+      {/* Search & Filters */}
+      <div className="mb-6 space-y-3">
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, breed, location…"
+            className="pl-9"
+          />
+        </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          <Select value={filterGender} onValueChange={setFilterGender}>
+            <SelectTrigger className="w-[140px]"><SelectValue placeholder="Gender" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Genders</SelectItem>
+              <SelectItem value="male">♂ Male</SelectItem>
+              <SelectItem value="female">♀ Female</SelectItem>
+              <SelectItem value="unknown">Unknown</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterBreed} onValueChange={setFilterBreed}>
+            <SelectTrigger className="w-[160px]"><SelectValue placeholder="Breed" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Breeds</SelectItem>
+              {uniqueBreeds.map((b) => (
+                <SelectItem key={b} value={b!}>{b}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={filterLocation} onValueChange={setFilterLocation}>
+            <SelectTrigger className="w-[160px]"><SelectValue placeholder="Location" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Locations</SelectItem>
+              {uniqueLocations.map((l) => (
+                <SelectItem key={l} value={l!}>{l}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+              <X size={14} className="mr-1" /> Clear
+            </Button>
+          )}
+        </div>
+      </div>
+
       {!user && (
         <p className="text-center text-muted-foreground mb-6">
           <a href="/auth" className="text-primary underline">Sign in</a> to post a cat for adoption.
@@ -214,14 +293,19 @@ const Adoptions = () => {
             </Card>
           ))}
         </div>
-      ) : listings.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-2">🐱</p>
-          <p className="text-muted-foreground">No cats up for adoption yet. Be the first to post!</p>
+          <p className="text-muted-foreground">
+            {hasActiveFilters ? "No cats match your filters. Try adjusting your search." : "No cats up for adoption yet. Be the first to post!"}
+          </p>
+          {hasActiveFilters && (
+            <Button variant="outline" size="sm" className="mt-3" onClick={clearFilters}>Clear filters</Button>
+          )}
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listings.map((cat) => (
+          {filtered.map((cat) => (
             <Card key={cat.id} className="overflow-hidden hover:shadow-hover transition-shadow group">
               <div className="relative h-52 bg-muted">
                 {cat.image_url ? (
