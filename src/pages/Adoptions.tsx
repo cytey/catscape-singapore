@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Heart, MapPin, Plus, Trash2, Upload, Search, X } from "lucide-react";
+import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star } from "lucide-react";
 import AdoptionDetailDialog from "@/components/AdoptionDetailDialog";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface AdoptionListing {
   id: string;
@@ -40,6 +41,8 @@ const Adoptions = () => {
   const [filterGender, setFilterGender] = useState("all");
   const [filterBreed, setFilterBreed] = useState("all");
   const [filterLocation, setFilterLocation] = useState("all");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { isFavorite, toggleFavorite, favoriteIds } = useFavorites();
   const [form, setForm] = useState({
     name: "",
     breed: "",
@@ -79,17 +82,19 @@ const Adoptions = () => {
       const matchesGender = filterGender === "all" || cat.gender === filterGender;
       const matchesBreed = filterBreed === "all" || cat.breed === filterBreed;
       const matchesLocation = filterLocation === "all" || cat.location === filterLocation;
-      return matchesSearch && matchesGender && matchesBreed && matchesLocation;
+      const matchesFavorites = !showFavoritesOnly || favoriteIds.includes(cat.id);
+      return matchesSearch && matchesGender && matchesBreed && matchesLocation && matchesFavorites;
     });
-  }, [listings, searchQuery, filterGender, filterBreed, filterLocation]);
+  }, [listings, searchQuery, filterGender, filterBreed, filterLocation, showFavoritesOnly, favoriteIds]);
 
-  const hasActiveFilters = searchQuery || filterGender !== "all" || filterBreed !== "all" || filterLocation !== "all";
+  const hasActiveFilters = searchQuery || filterGender !== "all" || filterBreed !== "all" || filterLocation !== "all" || showFavoritesOnly;
 
   const clearFilters = () => {
     setSearchQuery("");
     setFilterGender("all");
     setFilterBreed("all");
     setFilterLocation("all");
+    setShowFavoritesOnly(false);
   };
 
   const addMutation = useMutation({
