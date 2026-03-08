@@ -11,6 +11,7 @@ const features = [
   { icon: "📚", title: "Purr-fect Tips", desc: "Hiss-terical hacks and claw-ver guides for cat care. Be the best cat purr-ent!", path: "/guides", color: "primary" as const },
   { icon: "✨", title: "Cat-verter", desc: "Trans-fur your boring text into paw-some cat vocab-mew-lary! Meow-gical!", path: "/dictionary", color: "gold" as const },
   { icon: "🏥", title: "Cat Care Hub", desc: "Find vets, cat whisker-ers, fur-ster homes, pet taxis, and boarding fur-cilities.", path: "/services", color: "teal" as const },
+  { icon: "🏡", title: "Fur-ever Homes", desc: "Browse adorable cats waiting for their fur-ever families. Adopt, don't shop!", path: "/adoptions", color: "rose" as const },
 ];
 
 const Index = () => {
