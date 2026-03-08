@@ -275,6 +275,17 @@ const Adoptions = () => {
               ))}
             </SelectContent>
           </Select>
+          {user && (
+            <Button
+              variant={showFavoritesOnly ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFavoritesOnly((v) => !v)}
+              className={showFavoritesOnly ? "bg-primary text-primary-foreground" : ""}
+            >
+              <Star size={14} className={`mr-1 ${showFavoritesOnly ? "fill-current" : ""}`} />
+              Favorites{favoriteIds.length > 0 ? ` (${favoriteIds.length})` : ""}
+            </Button>
+          )}
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
               <X size={14} className="mr-1" /> Clear
@@ -328,6 +339,15 @@ const Adoptions = () => {
                   <div className="w-full h-full flex items-center justify-center text-5xl">🐱</div>
                 )}
                 <Badge className="absolute top-2 right-2 bg-primary/90 text-primary-foreground">{genderLabel(cat.gender)}</Badge>
+                {user && (
+                  <button
+                    className={`absolute top-2 left-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors ${isFavorite(cat.id) ? "text-primary" : "text-muted-foreground"}`}
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite.mutate(cat.id); }}
+                    aria-label={isFavorite(cat.id) ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <Star size={16} className={isFavorite(cat.id) ? "fill-current" : ""} />
+                  </button>
+                )}
               </div>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{cat.name}</CardTitle>
