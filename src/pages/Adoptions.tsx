@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +30,8 @@ interface AdoptionListing {
   contact_info: string;
   status: string;
   created_at: string;
+  poster_name: string | null;
+  poster_avatar: string | null;
 }
 
 const Adoptions = () => {
@@ -63,7 +66,20 @@ const Adoptions = () => {
         .eq("status", "available")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as AdoptionListing[];
+      if (!data || data.length === 0) return [] as AdoptionListing[];
+      
+      const userIds = [...new Set(data.map((r) => r.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", userIds);
+      
+      const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
+      return data.map((r) => ({
+        ...r,
+        poster_name: profileMap.get(r.user_id)?.display_name ?? null,
+        poster_avatar: profileMap.get(r.user_id)?.avatar_url ?? null,
+      })) as AdoptionListing[];
     },
   });
 
@@ -361,7 +377,15 @@ const Adoptions = () => {
                 <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                   <MapPin size={12} /> {cat.location}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">📞 {cat.contact_info}</p>
+                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
+                  <Avatar className="h-5 w-5">
+                    <AvatarImage src={cat.poster_avatar ?? undefined} />
+                    <AvatarFallback className="text-[10px] bg-secondary text-secondary-foreground">
+                      {(cat.poster_name ?? "?")[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-xs text-muted-foreground truncate">{cat.poster_name ?? "Anonymous"}</span>
+                </div>
               </CardContent>
               {user?.id === cat.user_id && (
                 <CardFooter className="pt-0">

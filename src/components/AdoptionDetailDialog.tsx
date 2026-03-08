@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
 
 interface AdoptionListing {
@@ -13,6 +14,8 @@ interface AdoptionListing {
   location: string;
   contact_info: string;
   created_at: string;
+  poster_name: string | null;
+  poster_avatar: string | null;
 }
 
 interface Props {
@@ -71,8 +74,17 @@ const AdoptionDetailDialog = ({ listing, open, onOpenChange }: Props) => {
               <MapPin size={14} className="text-primary" /> {listing.location}
             </p>
             <p className="text-muted-foreground">📞 {listing.contact_info}</p>
+            <div className="flex items-center gap-2 pt-2 border-t border-border">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={listing.poster_avatar ?? undefined} />
+                <AvatarFallback className="text-[10px] bg-secondary text-secondary-foreground">
+                  {(listing.poster_name ?? "?")[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm text-muted-foreground">Posted by {listing.poster_name ?? "Anonymous"}</span>
+            </div>
             <p className="text-xs text-muted-foreground/60">
-              Posted {new Date(listing.created_at).toLocaleDateString()}
+              {new Date(listing.created_at).toLocaleDateString()}
             </p>
           </div>
         </div>
