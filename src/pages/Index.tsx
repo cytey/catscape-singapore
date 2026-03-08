@@ -22,7 +22,7 @@ const Index = () => {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img src={heroImage} alt="Happy cats of Singapore" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
         </div>
         <div className="relative container mx-auto px-4 py-20 md:py-32">
           <motion.div className="max-w-2xl" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}>
@@ -70,6 +70,7 @@ const Index = () => {
               key={f.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.05, y: -8 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.4, delay: i * 0.08, ease: "easeOut" }}
             >
