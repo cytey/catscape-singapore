@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-cats.jpg";
 import FeatureCard from "@/components/FeatureCard";
 
@@ -64,10 +65,18 @@ const Index = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((f) => (
-            <Link key={f.title} to={f.path} className="block">
-              <FeatureCard icon={f.icon} title={f.title} description={f.desc} color={f.color} />
-            </Link>
+          {features.map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: i * 0.08, ease: "easeOut" }}
+            >
+              <Link to={f.path} className="block">
+                <FeatureCard icon={f.icon} title={f.title} description={f.desc} color={f.color} />
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
