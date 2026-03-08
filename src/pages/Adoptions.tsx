@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -308,7 +309,13 @@ const Adoptions = () => {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((cat) => (
-            <Card key={cat.id} className="overflow-hidden hover:shadow-hover transition-shadow group cursor-pointer" onClick={() => setDetailCat(cat)}>
+            <motion.div
+              key={cat.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: Math.min(filtered.indexOf(cat) * 0.08, 0.4) }}
+            >
+            <Card className="overflow-hidden hover:shadow-hover transition-shadow group cursor-pointer h-full" onClick={() => setDetailCat(cat)}>
               <div className="relative h-52 bg-muted">
                 {cat.image_url ? (
                   <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
@@ -344,6 +351,7 @@ const Adoptions = () => {
                 </CardFooter>
               )}
             </Card>
+            </motion.div>
           ))}
         </div>
       )}
