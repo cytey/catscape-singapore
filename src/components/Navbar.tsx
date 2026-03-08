@@ -22,6 +22,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
