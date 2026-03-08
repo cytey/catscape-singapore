@@ -1,17 +1,29 @@
-import { useState } from "react";
 import { Heart } from "lucide-react";
-
-const fundUpdates = [
-  { date: "Mar 2026", raised: 2450, spent: 1800, description: "Fur-nded TNR for 12 community cats in Tampines & bought kibble for 30+ void deck kitties! 🐱" },
-  { date: "Feb 2026", raised: 1890, spent: 1650, description: "Vet bills for 3 injured strays in Ang Mo Kio & cat flu medicine for the Bedok clowder! 💊" },
-  { date: "Jan 2026", raised: 3200, spent: 2900, description: "New fur-eeding stations installed in Jurong East. Spaying for 8 community queens! 👑" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Fundraising = () => {
-  const [donationAmount, setDonationAmount] = useState("");
+  const { data: campaigns = [] } = useQuery({
+    queryKey: ["fundraising-campaigns"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("fundraising_campaigns").select("*").eq("is_active", true);
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  const totalRaised = fundUpdates.reduce((sum, u) => sum + u.raised, 0);
-  const totalSpent = fundUpdates.reduce((sum, u) => sum + u.spent, 0);
+  const { data: updates = [] } = useQuery({
+    queryKey: ["fund-updates"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("fund_updates").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const totalGoal = campaigns.reduce((sum, c) => sum + Number(c.goal_amount), 0);
+  const totalRaised = campaigns.reduce((sum, c) => sum + Number(c.current_amount), 0);
+  const totalSpent = updates.reduce((sum, u) => sum + Number(u.amount_used || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -43,55 +55,58 @@ const Fundraising = () => {
         <div className="p-8 rounded-3xl bg-gradient-hero shadow-hover text-center">
           <Heart className="mx-auto mb-4 text-primary-foreground" size={40} />
           <h2 className="font-display text-2xl font-bold text-primary-foreground mb-4">Donate Meow!</h2>
-          <div className="flex gap-2 mb-4 justify-center">
-            {[5, 10, 25, 50].map((amt) => (
-              <button
-                key={amt}
-                onClick={() => setDonationAmount(String(amt))}
-                className={`px-4 py-2 rounded-xl font-display font-bold text-sm transition-all ${
-                  donationAmount === String(amt)
-                    ? "bg-card text-foreground shadow-card"
-                    : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
-                }`}
-              >
-                ${amt}
-              </button>
-            ))}
-          </div>
-          <input
-            type="number"
-            placeholder="Or enter a custom amount..."
-            value={donationAmount}
-            onChange={(e) => setDonationAmount(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-card text-foreground font-body placeholder:text-muted-foreground mb-4 border-0 focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <button className="w-full py-3 rounded-xl bg-card text-foreground font-display font-bold shadow-card hover:shadow-hover transition-all hover:-translate-y-0.5">
-            🐾 Paw-ceed to Donate
-          </button>
-          <p className="text-primary-foreground/70 text-xs mt-3">Payment integration coming soon! 🚀</p>
+          <p className="text-primary-foreground/70 text-sm">Payment integration coming soon! Contact us to donate directly. 🐾</p>
         </div>
       </div>
 
-      {/* Updates */}
-      <div className="max-w-2xl mx-auto">
-        <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">
-          📋 Fur-nd Usage Updates
-        </h2>
-        <div className="space-y-4">
-          {fundUpdates.map((update) => (
-            <div key={update.date} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-display font-bold text-foreground">{update.date}</span>
-                <div className="flex gap-4 text-sm">
-                  <span className="text-accent font-semibold">+${update.raised}</span>
-                  <span className="text-cat-rose font-semibold">-${update.spent}</span>
+      {/* Active Campaigns */}
+      {campaigns.length > 0 && (
+        <div className="max-w-2xl mx-auto mb-12">
+          <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">🎯 Active Campaigns</h2>
+          <div className="space-y-4">
+            {campaigns.map((campaign) => {
+              const progress = campaign.goal_amount > 0 ? (Number(campaign.current_amount) / Number(campaign.goal_amount)) * 100 : 0;
+              return (
+                <div key={campaign.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card">
+                  <h3 className="font-display font-bold text-foreground mb-2">{campaign.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{campaign.description}</p>
+                  <div className="w-full bg-secondary rounded-full h-3 mb-2">
+                    <div className="bg-gradient-hero h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">${Number(campaign.current_amount).toLocaleString()} raised</span>
+                    <span className="font-semibold text-foreground">${Number(campaign.goal_amount).toLocaleString()} goal</span>
+                  </div>
                 </div>
-              </div>
-              <p className="text-sm text-muted-foreground">{update.description}</p>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Updates */}
+      {updates.length > 0 && (
+        <div className="max-w-2xl mx-auto">
+          <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">📋 Fur-nd Usage Updates</h2>
+          <div className="space-y-4">
+            {updates.map((update) => (
+              <div key={update.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-display font-bold text-foreground">{update.title}</span>
+                  {update.amount_used && <span className="text-cat-rose font-semibold text-sm">-${Number(update.amount_used).toLocaleString()}</span>}
+                </div>
+                <p className="text-sm text-muted-foreground">{update.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {campaigns.length === 0 && updates.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No campaigns yet. Add them via the Cloud database! 🐾</p>
+        </div>
+      )}
     </div>
   );
 };

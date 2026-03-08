@@ -1,15 +1,16 @@
-const storeItems = [
-  { icon: "🍖", name: "Purr-emium Kibble", price: 24.90, desc: "Grain-free, fur-mula-ted for Singapore's tropical climate cats!" },
-  { icon: "🧸", name: "Catnip Mouse Toy", price: 8.90, desc: "Fur-illed with organic catnip. Warning: may cause extreme zoomies!" },
-  { icon: "🛏️", name: "Cozy Cat Loaf Bed", price: 39.90, desc: "The purr-fect bed for your fur-baby to make biscuits in!" },
-  { icon: "🪮", name: "De-shedding Fur-minator", price: 19.90, desc: "Say bye-bye to fur-niture covered in cat hair. A must-have!" },
-  { icon: "🎾", name: "Interactive Laser Toy", price: 15.90, desc: "Auto-rotating laser pointer for when you're too tired to play!" },
-  { icon: "👕", name: "CatScape Meow-ch Tee", price: 29.90, desc: "Rep the cat-munity! Available in sizes XS to XXL. Paw-some quality!" },
-  { icon: "🍣", name: "Tuna Treats (SG Edition)", price: 6.90, desc: "Made with locally-sourced tuna. Your cat will go absolutely mental!" },
-  { icon: "🏠", name: "Cat Condo Tower", price: 89.90, desc: "A fur-tress of fun! 5-tier cat tree with scratching posts and hidey-holes." },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Store = () => {
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["store-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("store_products").select("*").eq("in_stock", true).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-10">
@@ -19,27 +20,36 @@ const Store = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {storeItems.map((item) => (
-          <div key={item.name} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card hover:shadow-hover hover:-translate-y-1 transition-all group">
-            <div className="text-5xl mb-4 group-hover:animate-paw-bounce">{item.icon}</div>
-            <h3 className="font-display text-base font-bold text-foreground mb-1">{item.name}</h3>
-            <p className="text-xs text-muted-foreground mb-3">{item.desc}</p>
-            <div className="flex items-center justify-between">
-              <span className="font-display font-bold text-lg text-gradient-hero">${item.price.toFixed(2)}</span>
-              <button className="px-3 py-1.5 rounded-lg bg-gradient-hero text-primary-foreground text-xs font-display font-bold shadow-soft hover:shadow-hover transition-all">
-                Add to Cart 🐾
-              </button>
+      {isLoading ? (
+        <div className="text-center py-12"><p className="text-4xl animate-paw-bounce">🛍️</p><p className="text-muted-foreground mt-2">Loading meow-chandise...</p></div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-4xl mb-3">🐱</p>
+          <p className="text-muted-foreground font-display text-lg">New products coming soon! Stay paw-sitive!</p>
+          <p className="text-muted-foreground text-sm mt-2">Add products via the Cloud database to see them here.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          {products.map((item) => (
+            <div key={item.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card hover:shadow-hover hover:-translate-y-1 transition-all group">
+              {item.image_url ? (
+                <img src={item.image_url} alt={item.name} className="w-full h-40 object-cover rounded-xl mb-4" />
+              ) : (
+                <div className="w-full h-40 rounded-xl mb-4 bg-secondary flex items-center justify-center text-5xl">🐱</div>
+              )}
+              <h3 className="font-display text-base font-bold text-foreground mb-1">{item.name}</h3>
+              {item.category && <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-semibold">{item.category}</span>}
+              <p className="text-xs text-muted-foreground mb-3 mt-2">{item.description}</p>
+              <div className="flex items-center justify-between">
+                <span className="font-display font-bold text-lg text-gradient-hero">${Number(item.price).toFixed(2)}</span>
+                <button className="px-3 py-1.5 rounded-lg bg-gradient-hero text-primary-foreground text-xs font-display font-bold shadow-soft hover:shadow-hover transition-all">
+                  Add to Cart 🐾
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="text-center mt-12 p-6 rounded-2xl bg-secondary max-w-md mx-auto">
-        <p className="text-muted-foreground text-sm">
-          🚧 Full e-com-mew-rce coming soon! Products will be purr-chaseable with backend integration.
-        </p>
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

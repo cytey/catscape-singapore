@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import catLogo from "@/assets/catscape-logo.png";
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
@@ -42,13 +44,25 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            {user ? (
+              <button
+                onClick={() => signOut()}
+                className="ml-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all inline-flex items-center gap-1"
+              >
+                <LogOut size={16} /> Sign Out
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="ml-2 px-4 py-2 rounded-lg bg-gradient-hero text-primary-foreground text-sm font-bold shadow-soft hover:shadow-hover transition-all inline-flex items-center gap-1"
+              >
+                <LogIn size={16} /> Sign In
+              </Link>
+            )}
           </div>
 
           {/* Mobile toggle */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-secondary"
-          >
+          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-secondary">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -71,6 +85,18 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
+              {user ? (
+                <button
+                  onClick={() => { signOut(); setIsOpen(false); }}
+                  className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary text-left inline-flex items-center gap-2"
+                >
+                  <LogOut size={16} /> Sign Out
+                </button>
+              ) : (
+                <Link to="/auth" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-lg bg-gradient-hero text-primary-foreground text-sm font-bold text-center">
+                  🐾 Sign In / Join
+                </Link>
+              )}
             </div>
           </div>
         )}
