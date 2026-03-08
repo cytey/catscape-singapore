@@ -9,6 +9,7 @@ const navItems = [
   { path: "/fundraising", label: "💰 Paw-Fund" },
   { path: "/store", label: "🛍️ Cat-alogue" },
   { path: "/community-cats", label: "🐱 Whisker Watch" },
+  { path: "/lost-found", label: "🔍 Lost & Found" },
   { path: "/dictionary", label: "📖 Meow-tionary" },
   { path: "/news", label: "📰 Cat-ch Up" },
   { path: "/guides", label: "📚 Purr-fect Tips" },
