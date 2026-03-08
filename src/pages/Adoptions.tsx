@@ -337,7 +337,7 @@ const Adoptions = () => {
                     variant="ghost"
                     size="sm"
                     className="text-destructive hover:text-destructive"
-                    onClick={() => deleteMutation.mutate(cat.id)}
+                    onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(cat.id); }}
                   >
                     <Trash2 size={14} className="mr-1" /> Remove
                   </Button>
@@ -347,6 +347,9 @@ const Adoptions = () => {
           ))}
         </div>
       )}
+
+      <AdoptionDetailDialog listing={detailCat} open={!!detailCat} onOpenChange={(o) => !o && setDetailCat(null)} />
+    </div>
     </div>
   );
 };
