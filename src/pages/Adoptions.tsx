@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star, Pencil } from "lucide-react";
+import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star, Pencil, Check } from "lucide-react";
 import AdoptionDetailDialog from "@/components/AdoptionDetailDialog";
 import EditAdoptionDialog from "@/components/EditAdoptionDialog";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -149,6 +149,18 @@ const Adoptions = () => {
       queryClient.invalidateQueries({ queryKey: ["adoption-listings"] });
       toast({ title: "Listing removed" });
     },
+  });
+
+  const markAdoptedMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("adoption_listings").update({ status: "adopted" }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adoption-listings"] });
+      toast({ title: "🎉 Congrats!", description: "Your kitty has found their fur-ever home!" });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -390,7 +402,7 @@ const Adoptions = () => {
                 </div>
               </CardContent>
               {user?.id === cat.user_id && (
-                <CardFooter className="pt-0 gap-2">
+                <CardFooter className="pt-0 gap-2 flex-wrap">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -398,6 +410,14 @@ const Adoptions = () => {
                     onClick={(e) => { e.stopPropagation(); setEditCat(cat); }}
                   >
                     <Pencil size={14} className="mr-1" /> Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:text-primary hover:bg-primary/10"
+                    onClick={(e) => { e.stopPropagation(); markAdoptedMutation.mutate(cat.id); }}
+                  >
+                    <Check size={14} className="mr-1" /> Mark Adopted
                   </Button>
                   <Button
                     variant="ghost"
