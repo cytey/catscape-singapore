@@ -75,9 +75,24 @@ const Navbar = () => {
                 <LogIn size={16} /> Sign In
               </Link>
             )}
+            <button
+              onClick={toggleTheme}
+              className="ml-1 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
           </div>
 
           {/* Mobile toggle */}
+          <div className="lg:hidden flex items-center gap-1">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:bg-secondary"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
           <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-secondary">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
