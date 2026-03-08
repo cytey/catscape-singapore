@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      adoption_listings: {
+        Row: {
+          age: string | null
+          breed: string | null
+          contact_info: string
+          created_at: string
+          description: string | null
+          gender: string | null
+          id: string
+          image_url: string | null
+          location: string
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: string | null
+          breed?: string | null
+          contact_info: string
+          created_at?: string
+          description?: string | null
+          gender?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: string | null
+          breed?: string | null
+          contact_info?: string
+          created_at?: string
+          description?: string | null
+          gender?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       community_cats: {
         Row: {
           created_at: string

@@ -16,6 +16,7 @@ const navItems = [
   { path: "/guides", label: "📚 Purr-fect Tips" },
   { path: "/cat-verter", label: "🔄 Cat-verter" },
   { path: "/services", label: "🏥 Cat Care Hub" },
+  { path: "/adoptions", label: "🏡 Fur-ever Homes" },
 ];
 
 const Navbar = () => {
