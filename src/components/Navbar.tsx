@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, LogIn, LogOut, User } from "lucide-react";
+import { Menu, X, LogIn, LogOut, User, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import catLogo from "@/assets/catscape-logo.png";
 
 const navItems = [
@@ -21,6 +22,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
@@ -73,12 +75,28 @@ const Navbar = () => {
                 <LogIn size={16} /> Sign In
               </Link>
             )}
+            <button
+              onClick={toggleTheme}
+              className="ml-1 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
           </div>
 
           {/* Mobile toggle */}
-          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-secondary">
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="lg:hidden flex items-center gap-1">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:bg-secondary"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg text-muted-foreground hover:bg-secondary">
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile nav */}
