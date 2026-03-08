@@ -49,8 +49,8 @@ const Index = () => {
               >
                 🐱 Whisker Watch
               </Link>
+            </div>
           </motion.div>
-          </div>
         </div>
       </section>
 
