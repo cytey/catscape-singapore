@@ -13,8 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star } from "lucide-react";
+import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star, Pencil } from "lucide-react";
 import AdoptionDetailDialog from "@/components/AdoptionDetailDialog";
+import EditAdoptionDialog from "@/components/EditAdoptionDialog";
 import { useFavorites } from "@/hooks/useFavorites";
 
 interface AdoptionListing {
