@@ -93,10 +93,10 @@ const Navbar = () => {
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-secondary">
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+            <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg text-muted-foreground hover:bg-secondary">
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
 
         {/* Mobile nav */}
         {isOpen && (
