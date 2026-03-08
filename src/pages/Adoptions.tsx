@@ -414,7 +414,7 @@ const Adoptions = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+                    className="text-primary hover:text-primary hover:bg-primary/10"
                     onClick={(e) => { e.stopPropagation(); markAdoptedMutation.mutate(cat.id); }}
                   >
                     <Check size={14} className="mr-1" /> Mark Adopted
