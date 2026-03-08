@@ -97,6 +97,7 @@ const Navbar = () => {
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
+        </div>
 
         {/* Mobile nav */}
         {isOpen && (
@@ -145,7 +146,6 @@ const Navbar = () => {
           </div>
         )}
       </div>
-    </nav>
   );
 };
 
