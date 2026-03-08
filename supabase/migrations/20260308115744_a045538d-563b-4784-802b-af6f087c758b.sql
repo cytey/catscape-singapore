@@ -1,0 +1,1 @@
+ALTER TABLE public.adoption_listings DROP CONSTRAINT adoption_listings_user_id_fkey;
