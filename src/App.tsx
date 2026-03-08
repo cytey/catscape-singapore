@@ -16,6 +16,7 @@ import CommunityCats from "./pages/CommunityCats";
 import Auth from "./pages/Auth";
 import CatVerter from "./pages/CatVerter";
 import LostFound from "./pages/LostFound";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/community-cats" element={<CommunityCats />} />
               <Route path="/cat-verter" element={<CatVerter />} />
               <Route path="/lost-found" element={<LostFound />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
