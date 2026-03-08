@@ -25,7 +25,7 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
         </div>
         <div className="relative container mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-2xl animate-fade-in-up">
+          <motion.div className="max-w-2xl" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}>
             <h1 className="font-display text-4xl md:text-6xl font-bold mb-4">
               <span className="text-gradient-hero">CatScape</span>
               <span className="block text-2xl md:text-3xl mt-2 text-foreground">
@@ -49,7 +49,7 @@ const Index = () => {
               >
                 🐱 Whisker Watch
               </Link>
-            </div>
+          </motion.div>
           </div>
         </div>
       </section>
@@ -83,7 +83,7 @@ const Index = () => {
 
       {/* CTA */}
       <section className="container mx-auto px-4 py-16">
-        <div className="bg-gradient-hero rounded-3xl p-8 md:p-12 text-center shadow-hover">
+        <motion.div className="bg-gradient-hero rounded-3xl p-8 md:p-12 text-center shadow-hover" initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
             Ready to Join the Clowder? 😸
           </h2>
@@ -97,7 +97,7 @@ const Index = () => {
           >
             🐾 Start Your Purr-ney
           </Link>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
