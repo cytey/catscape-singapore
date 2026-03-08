@@ -41,6 +41,7 @@ const Adoptions = () => {
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [detailCat, setDetailCat] = useState<AdoptionListing | null>(null);
+  const [editCat, setEditCat] = useState<AdoptionListing | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterGender, setFilterGender] = useState("all");
   const [filterBreed, setFilterBreed] = useState("all");
@@ -389,7 +390,15 @@ const Adoptions = () => {
                 </div>
               </CardContent>
               {user?.id === cat.user_id && (
-                <CardFooter className="pt-0">
+                <CardFooter className="pt-0 gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={(e) => { e.stopPropagation(); setEditCat(cat); }}
+                  >
+                    <Pencil size={14} className="mr-1" /> Edit
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -407,6 +416,7 @@ const Adoptions = () => {
       )}
 
       <AdoptionDetailDialog listing={detailCat} open={!!detailCat} onOpenChange={(o) => !o && setDetailCat(null)} />
+      <EditAdoptionDialog listing={editCat} open={!!editCat} onOpenChange={(o) => !o && setEditCat(null)} />
     </div>
   );
 };
