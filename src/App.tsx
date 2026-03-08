@@ -16,6 +16,7 @@ import CommunityCats from "./pages/CommunityCats";
 import Auth from "./pages/Auth";
 import CatVerter from "./pages/CatVerter";
 import LostFound from "./pages/LostFound";
+import Adoptions from "./pages/Adoptions";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/community-cats" element={<CommunityCats />} />
               <Route path="/cat-verter" element={<CatVerter />} />
               <Route path="/lost-found" element={<LostFound />} />
+              <Route path="/adoptions" element={<Adoptions />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
