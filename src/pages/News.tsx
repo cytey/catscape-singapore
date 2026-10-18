@@ -1,4 +1,5 @@
 import { useSEO } from "@/hooks/useSEO";
+import ShareButtons from "@/components/ShareButtons";
 
 const newsItems = [
   { date: "Mar 7, 2026", title: "🎉 Cat-Fest 2026 at Bishan Park!", desc: "Singapore's biggest cat-lebration is back! Join us for a day of fur-n with adoption drives, cat yoga, and the Annual Chonk Purr-ade!", tag: "Event" },
@@ -44,6 +45,7 @@ const News = () => {
             </div>
             <h3 className="font-display text-lg font-bold text-foreground mb-2">{item.title}</h3>
             <p className="text-sm text-muted-foreground">{item.desc}</p>
+            <ShareButtons title={item.title} path="/news" className="mt-3" />
           </div>
         ))}
       </div>

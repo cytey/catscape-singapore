@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Copy, Check, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSEO } from "@/hooks/useSEO";
 
 const CATVERTER_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cat-verter`;
 
@@ -12,6 +13,13 @@ const exampleTexts = [
 ];
 
 const CatVerter = () => {
+  useSEO({
+    title: "The Cat-verter – Transform Text into Cat Vocabulary",
+    description: "Turn any boring hooman text into purr-fect cat puns and vocabulary with AI meow-gic. Free online cat-verter powered by CatScape Singapore.",
+    keywords: ["cat pun generator", "cat translator", "cat text converter", "cat vocabulary generator", "meow translator"],
+    jsonLd: { "@context": "https://schema.org", "@type": "WebApplication", name: "CatScape Cat-verter", applicationCategory: "EntertainmentApplication", description: "AI tool that transforms text into cat-themed vocabulary and puns.", offers: { "@type": "Offer", price: "0", priceCurrency: "SGD" } },
+  });
+
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

@@ -1,5 +1,6 @@
-import { Heart } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Heart, Mail, Loader2 } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSEO } from "@/hooks/useSEO";
 
@@ -33,6 +34,26 @@ const Fundraising = () => {
   const totalRaised = campaigns.reduce((sum, c) => sum + Number(c.current_amount), 0);
   const totalSpent = updates.reduce((sum, u) => sum + Number(u.amount_used || 0), 0);
 
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const subscribeMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("paw_date_subscribers")
+        .insert({ email: email.trim().toLowerCase() });
+      if (error) {
+        // Unique violation means already subscribed — treat as success
+        if ((error as { code?: string }).code === "23505") return;
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      setSubscribed(true);
+      setEmail("");
+    },
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-10">
@@ -64,6 +85,42 @@ const Fundraising = () => {
           <Heart className="mx-auto mb-4 text-primary-foreground" size={40} />
           <h2 className="font-display text-2xl font-bold text-primary-foreground mb-4">Donate Meow!</h2>
           <p className="text-primary-foreground/70 text-sm">Payment integration coming soon! Contact us to donate directly. 🐾</p>
+        </div>
+      </div>
+
+      {/* Email updates */}
+      <div className="max-w-md mx-auto mb-12">
+        <div className="p-8 rounded-3xl bg-card border-2 border-accent/25 shadow-card text-center">
+          <Mail className="mx-auto mb-3 text-accent" size={32} />
+          <h2 className="font-display text-xl font-bold text-foreground mb-2">Get Paw-date Updates 📬</h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            Be the first to know about new campaigns, cat care milestones and community cat news.
+          </p>
+          {subscribed ? (
+            <p className="text-accent font-semibold text-sm">😸 You're on the list! Watch your inbox for paw-dates.</p>
+          ) : (
+            <form
+              onSubmit={(e) => { e.preventDefault(); subscribeMutation.mutate(); }}
+              className="flex flex-col sm:flex-row gap-2"
+            >
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@catscape.sg"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-background border-2 border-border focus:border-accent focus:outline-none text-foreground placeholder:text-muted-foreground text-sm"
+              />
+              <button
+                type="submit"
+                disabled={subscribeMutation.isPending}
+                className="px-5 py-2.5 rounded-xl bg-gradient-hero text-primary-foreground font-display font-bold text-sm shadow-soft hover:shadow-hover transition-all disabled:opacity-60 inline-flex items-center justify-center gap-1.5"
+              >
+                {subscribeMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+                Subscribe
+              </button>
+            </form>
+          )}
         </div>
       </div>
 

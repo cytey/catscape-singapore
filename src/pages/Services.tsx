@@ -1,4 +1,5 @@
 import FeatureCard from "@/components/FeatureCard";
+import { useSEO } from "@/hooks/useSEO";
 
 const services = [
   { icon: "🏥", title: "Vets & Cat-linics", items: ["The Cat Clinic (Tanjong Pagar)", "Mount Pleasant Vet Centre", "Jireh Veterinary Clinic", "Animal & Avian Veterinary Clinic"], color: "teal" as const },
@@ -8,6 +9,29 @@ const services = [
 ];
 
 const Services = () => {
+  useSEO({
+    title: "Vets, Boarding & Pet Taxi for Cats in Singapore – Cat Care Hub",
+    description: "Singapore's cat services directory: vet clinics, cat boarding and foster services, pet taxis, and cat behaviourists (cat whisperers) — all in one place.",
+    keywords: ["cat vet Singapore", "cat clinic Singapore", "cat boarding Singapore", "pet taxi Singapore", "cat behaviourist Singapore", "cat foster services"],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Singapore Cat Services Directory",
+      itemListElement: [
+        "The Cat Clinic (Tanjong Pagar)",
+        "Mount Pleasant Vet Centre",
+        "Jireh Veterinary Clinic",
+        "Animal & Avian Veterinary Clinic",
+        "The Cat Museum Boarding",
+        "Neko no Niwa Cat Café",
+        "Catopia Cat Boarding",
+        "Kitty Care Haven",
+        "SG Pet Taxi",
+        "Pawfect Rides",
+      ].map((name, i) => ({ "@type": "ListItem", position: i + 1, name })),
+    },
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-10">

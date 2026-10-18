@@ -3,9 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { lovable } from "@/integrations/lovable/index";
+import { useSEO } from "@/hooks/useSEO";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+
+  useSEO({
+    title: isSignUp ? "Join the Clowder – Create Account" : "Sign In to CatScape",
+    description: "Sign in to CatScape, Singapore's cat superapp — post adoptions, track community cats, save favourites and get paw-date updates.",
+    keywords: ["CatScape account", "join cat community Singapore"],
+  });
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");

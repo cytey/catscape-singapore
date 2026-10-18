@@ -5,10 +5,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Clock, Search, Plus, X, AlertTriangle, Heart } from "lucide-react";
 import { format } from "date-fns";
+import { useSEO } from "@/hooks/useSEO";
+import ShareButtons from "@/components/ShareButtons";
 
 type ReportType = "lost" | "found";
 
 const LostFound = () => {
+  useSEO({
+    title: "Lost & Found Cats in Singapore",
+    description: "Lost your cat or spotted a missing one? Report and browse lost and found cats across Singapore to help reunite kitties with their families.",
+    keywords: ["lost cat Singapore", "found cat Singapore", "missing cat Singapore", "reunite lost pets Singapore"],
+    jsonLd: { "@context": "https://schema.org", "@type": "CollectionPage", name: "CatScape Lost & Found", description: "Lost and found cat reports for Singapore." },
+  });
+
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -251,6 +260,7 @@ const LostFound = () => {
                   <Clock size={12} /> {format(new Date(report.created_at), "MMM d, yyyy")}
                 </div>
                 <p className="text-sm font-medium text-foreground">📞 {report.contact_info}</p>
+                <ShareButtons title={`🐾 ${report.type === "lost" ? "Lost" : "Found"} cat: ${report.name}`} className="mt-2" />
                 {user && report.user_id === user.id && report.status === "active" && (
                   <button
                     onClick={() => resolveMutation.mutate(report.id)}

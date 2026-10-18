@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
+import { useSEO } from "@/hooks/useSEO";
 
 const statusColors = {
   fed: "bg-accent/10 text-accent border-accent/20",
@@ -19,6 +20,13 @@ const statusLabels = {
 };
 
 const CommunityCats = () => {
+  useSEO({
+    title: "Whisker Watch – Track Community Cats in Singapore",
+    description: "Register community cats, update their feeding status, and help care for Singapore's void deck kitties. Track every whisker in your neighbourhood.",
+    keywords: ["community cats Singapore", "feed stray cats Singapore", "void deck cats", "cat feeding status", "TNR Singapore", "stray cat tracker"],
+    jsonLd: { "@context": "https://schema.org", "@type": "CollectionPage", name: "CatScape Whisker Watch", description: "Community cat tracker for Singapore neighbourhoods." },
+  });
+
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();

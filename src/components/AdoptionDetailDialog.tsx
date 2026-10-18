@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
+import ShareButtons from "@/components/ShareButtons";
 
 interface AdoptionListing {
   id: string;
@@ -86,6 +87,10 @@ const AdoptionDetailDialog = ({ listing, open, onOpenChange }: Props) => {
             <p className="text-xs text-muted-foreground/60">
               {new Date(listing.created_at).toLocaleDateString()}
             </p>
+            <div className="pt-3 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">🐾 Know someone looking for a fur-ever friend? Share {listing.name}!</p>
+              <ShareButtons title={`🐱 Adopt ${listing.name} in Singapore`} path="/adoptions" />
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
+import ShareButtons from "@/components/ShareButtons";
 
 const catVocabulary = [
   { term: "Blep", definition: "When a cat sticks out just the tip of their tongue and fur-gets to put it back. Absolutely purr-cious!", category: "Expressions" },
@@ -141,6 +142,7 @@ const Dictionary = () => {
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">{v.definition}</p>
+            <ShareButtons title={`🐱 What does "${v.term}" mean?`} path={`/dictionary?q=${encodeURIComponent(v.term)}`} className="mt-3" />
           </div>
         ))}
       </div>
