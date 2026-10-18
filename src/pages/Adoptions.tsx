@@ -17,6 +17,7 @@ import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star, Pencil, Check } f
 import AdoptionDetailDialog from "@/components/AdoptionDetailDialog";
 import EditAdoptionDialog from "@/components/EditAdoptionDialog";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useSEO } from "@/hooks/useSEO";
 
 interface AdoptionListing {
   id: string;
@@ -36,6 +37,13 @@ interface AdoptionListing {
 }
 
 const Adoptions = () => {
+  useSEO({
+    title: "Cat Adoption in Singapore – Fur-ever Homes",
+    description: "Browse cats available for adoption in Singapore. Find your fur-ever companion by breed, age, gender and location. Adopt, don't shop!",
+    keywords: ["cat adoption Singapore", "adopt cat Singapore", "kitten adoption Singapore", "rescue cat Singapore", "HDB cat adoption"],
+    jsonLd: { "@context": "https://schema.org", "@type": "CollectionPage", name: "CatScape Fur-ever Homes", description: "Cats available for adoption in Singapore.", about: { "@type": "Thing", name: "Cat adoption in Singapore" } },
+  });
+
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);

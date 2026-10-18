@@ -1,3 +1,5 @@
+import { useSEO } from "@/hooks/useSEO";
+
 const newsItems = [
   { date: "Mar 7, 2026", title: "🎉 Cat-Fest 2026 at Bishan Park!", desc: "Singapore's biggest cat-lebration is back! Join us for a day of fur-n with adoption drives, cat yoga, and the Annual Chonk Purr-ade!", tag: "Event" },
   { date: "Mar 5, 2026", title: "📋 New HDB Cat-Friendly Purr-licy Update", desc: "Great mews! HDB has expanded the list of approved cat breeds. More fur-babies can now live in flats o-fur-cially!", tag: "News" },
@@ -15,6 +17,13 @@ const tagColors: Record<string, string> = {
 };
 
 const News = () => {
+  useSEO({
+    title: "Cat News & Events in Singapore – Cat-ch Up",
+    description: "Latest cat news, events, viral stories and advisories in Singapore: Cat-Fest, HDB cat policy updates, TNR clinics, cat café events and more.",
+    keywords: ["cat news Singapore", "cat events Singapore", "Cat-Fest Singapore", "HDB cat policy", "TNR clinic Singapore", "cat welfare news"],
+    jsonLd: { "@context": "https://schema.org", "@type": "Blog", name: "CatScape Cat-ch Up", description: "Singapore cat news, events and advisories." },
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-10">

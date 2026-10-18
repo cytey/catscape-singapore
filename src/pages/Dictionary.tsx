@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
+import { useSEO } from "@/hooks/useSEO";
 
 const catVocabulary = [
   { term: "Blep", definition: "When a cat sticks out just the tip of their tongue and fur-gets to put it back. Absolutely purr-cious!", category: "Expressions" },
@@ -40,8 +42,36 @@ const catVocabulary = [
 const categories = [...new Set(catVocabulary.map((v) => v.category))];
 
 const Dictionary = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Sync search with URL ?q= for shareable/indexable links
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) setSearch(q);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (search) setSearchParams({ q: search }, { replace: true });
+      else if (searchParams.get("q")) setSearchParams({}, { replace: true });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [search, searchParams, setSearchParams]);
+
+  const activeTerm = catVocabulary.find((v) => v.term.toLowerCase() === search.toLowerCase().trim());
+
+  useSEO({
+    title: activeTerm ? `${activeTerm.term} – Cat Term Definition` : "Cat Vocabulary Dictionary (Meow-tionary)",
+    description: activeTerm
+      ? `${activeTerm.term}: ${activeTerm.definition.slice(0, 140)}`
+      : "The complete cat vocabulary dictionary — learn blep, mlem, zoomies, toe beans, sploot, chonk, floof, purrito, TNR and 30+ more cat terms.",
+    keywords: ["cat vocabulary", "cat terms", "cat slang dictionary", "blep", "zoomies", "toe beans", "sploot", "chonk", "floof", "cat language"],
+    jsonLd: activeTerm
+      ? { "@context": "https://schema.org", "@type": "DefinedTerm", name: activeTerm.term, description: activeTerm.definition, inDefinedTermSet: "CatScape Meow-tionary" }
+      : { "@context": "https://schema.org", "@type": "CollectionPage", name: "CatScape Meow-tionary", description: "Complete cat vocabulary dictionary with definitions of cat slang, behavior, anatomy, and community terms." },
+  });
 
   const filtered = catVocabulary.filter((v) => {
     const matchesSearch =

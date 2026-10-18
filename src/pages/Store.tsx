@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useSEO } from "@/hooks/useSEO";
 
 const Store = () => {
+  useSEO({
+    title: "Cat-alogue Store – Cat Products & Meow-chandise",
+    description: "Shop the best cat products in Singapore: food, treats, toys, beds, scratchers and meow-chandise. Treat your fur-baby today!",
+    keywords: ["cat products Singapore", "cat store Singapore", "cat food Singapore", "cat toys", "cat meow-chandise", "pet supplies Singapore"],
+    jsonLd: { "@context": "https://schema.org", "@type": "Store", name: "CatScape Cat-alogue", description: "Online store for cat products in Singapore." },
+  });
+
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["store-products"],
     queryFn: async () => {

@@ -1,8 +1,16 @@
 import { Heart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useSEO } from "@/hooks/useSEO";
 
 const Fundraising = () => {
+  useSEO({
+    title: "Paw-Fund – Donate to Singapore's Community Cats",
+    description: "Donate to help Singapore's community cats and fur-babies in need. See live fundraising progress and transparent fund-usage updates for cat care, TNR, and vet bills.",
+    keywords: ["donate cats Singapore", "community cat donation", "cat fundraising Singapore", "TNR funding", "cat welfare donation"],
+    jsonLd: { "@context": "https://schema.org", "@type": "DonateAction", name: "CatScape Paw-Fund", recipient: { "@type": "NGO", name: "CatScape Singapore" } },
+  });
+
   const { data: campaigns = [] } = useQuery({
     queryKey: ["fundraising-campaigns"],
     queryFn: async () => {

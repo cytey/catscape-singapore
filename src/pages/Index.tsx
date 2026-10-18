@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-cats.jpg";
 import FeatureCard from "@/components/FeatureCard";
+import { useSEO } from "@/hooks/useSEO";
 
 const features = [
   { icon: "💰", title: "Paw-Fund", desc: "Fur-ndraising for community cats and your fur-babies. Every purr-ny counts!", path: "/fundraising", color: "primary" as const },
@@ -16,6 +17,24 @@ const features = [
 ];
 
 const Index = () => {
+  useSEO({
+    title: "CatScape – Singapore's Purr-mier Cat Superapp",
+    description: "Singapore's one-stop cat superapp: fundraise for community cats, adopt fur-ever homes, track Whisker Watch, browse the Meow-tionary, find vets & boarding, and more.",
+    keywords: ["cat Singapore", "community cats Singapore", "cat adoption Singapore", "cat superapp", "cat care Singapore", "TNR Singapore", "cat boarding Singapore"],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "CatScape",
+      url: "https://catscape.sg",
+      description: "Singapore's one-stop cat superapp for fundraising, community cat care, adoption, vocabulary, guides and services.",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://catscape.sg/dictionary?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+  });
+
   return (
     <div>
       {/* Hero Section */}

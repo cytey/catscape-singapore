@@ -1,3 +1,5 @@
+import { useSEO } from "@/hooks/useSEO";
+
 const guides = [
   { icon: "🍽️", title: "The Purr-fect Diet", desc: "What to fur-eed your cat: wet vs dry, raw diets, and Singapore-specific brands. No table scraps — that's a cat-astrophe waiting to happen!", tips: ["Wet food for hydration", "Grain-free options available at Pet Lovers Centre", "Fresh water always — cats are notoriously fussy drinkers!"] },
   { icon: "🏠", title: "Cat-Proofing Your HDB", desc: "Make your flat a fur-tress of safety! Window mesh, toxic plant removal, and hiding those tempting cables.", tips: ["Install window mesh (mandatory in SG!)", "Remove lilies — they're toxic to cats!", "Secure loose cables with cable organizers"] },
@@ -8,6 +10,13 @@ const guides = [
 ];
 
 const Guides = () => {
+  useSEO({
+    title: "Cat Care Guides & Tips in Singapore – Purr-fect Tips",
+    description: "Practical cat care guides for Singapore owners: diet, HDB cat-proofing, vet visit prep, fur removal hacks, heat protection, and pet travel tips.",
+    keywords: ["cat care Singapore", "cat care guide", "HDB cat proofing", "cat diet Singapore", "cat vet tips", "cat heat Singapore", "cat travel Singapore"],
+    jsonLd: { "@context": "https://schema.org", "@type": "CollectionPage", name: "CatScape Purr-fect Tips", description: "Cat care guides and tips for Singapore owners." },
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-10">
