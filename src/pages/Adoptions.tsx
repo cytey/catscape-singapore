@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Heart, MapPin, Plus, Trash2, Upload, Search, X, Star, Pencil, Check } from "lucide-react";
@@ -157,6 +169,7 @@ const Adoptions = () => {
       queryClient.invalidateQueries({ queryKey: ["adoption-listings"] });
       toast({ title: "Listing removed" });
     },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
 
   const markAdoptedMutation = useMutation({
@@ -263,7 +276,7 @@ const Adoptions = () => {
                 </div>
                 <Button
                   onClick={() => addMutation.mutate()}
-                  disabled={!form.name || !form.location || !form.contact_info || addMutation.isPending}
+                  disabled={!form.name || !form.location || !form.contact_info || uploading || addMutation.isPending}
                   className="bg-gradient-hero text-primary-foreground"
                 >
                   {addMutation.isPending ? "Posting…" : "🐾 Post Listing"}
@@ -334,7 +347,7 @@ const Adoptions = () => {
 
       {!user && (
         <p className="text-center text-muted-foreground mb-6">
-          <a href="/auth" className="text-primary underline">Sign in</a> to post a cat for adoption.
+          <Link to="/auth" className="text-primary underline hover:text-primary/80">Sign in</Link> to post a cat for adoption.
         </p>
       )}
 
@@ -427,14 +440,35 @@ const Adoptions = () => {
                   >
                     <Check size={14} className="mr-1" /> Mark Adopted
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                    onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(cat.id); }}
-                  >
-                    <Trash2 size={14} className="mr-1" /> Remove
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Trash2 size={14} className="mr-1" /> Remove
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Remove this listing?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete {cat.name}'s adoption listing. This cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep listing</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => deleteMutation.mutate(cat.id)}
+                        >
+                          Remove listing
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardFooter>
               )}
             </Card>

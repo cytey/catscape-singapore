@@ -63,6 +63,7 @@ const NavLink = ({ to, children, onClick }: { to: string; children: React.ReactN
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { pathname } = useLocation();
   const { user, signOut } = useAuth();
   const { theme, toggle: toggleTheme } = useTheme();
 
@@ -107,7 +108,7 @@ const Navbar = () => {
                   <Link
                     to="/profile"
                     className={`p-2 rounded-lg transition-colors inline-flex items-center ${
-                      isActive("/profile", location.pathname)
+                      isActive("/profile", pathname)
                         ? "text-foreground bg-secondary"
                         : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
                     }`}
@@ -170,7 +171,7 @@ const Navbar = () => {
                   to={item.path}
                   onClick={closeMenu}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive(item.path, location.pathname)
+                    isActive(item.path, pathname)
                       ? "bg-secondary text-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
                   }`}

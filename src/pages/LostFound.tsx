@@ -1,9 +1,16 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Clock, Search, Plus, X, AlertTriangle, Heart } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { MapPin, Clock, Search, Plus, AlertTriangle, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { useSEO } from "@/hooks/useSEO";
 import ShareButtons from "@/components/ShareButtons";
@@ -22,7 +29,7 @@ const LostFound = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<"all" | ReportType>("all");
-  const [showForm, setShowForm] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [formType, setFormType] = useState<ReportType>("lost");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -85,10 +92,11 @@ const LostFound = () => {
       queryClient.invalidateQueries({ queryKey: ["lost-found-cats"] });
       toast({ title: "Purr-fect news! 🎉", description: "Report marked as resolved!" });
     },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const resetForm = () => {
-    setShowForm(false);
+    setFormOpen(false);
     setName("");
     setDescription("");
     setLocation("");
@@ -112,119 +120,125 @@ const LostFound = () => {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
         <div className="flex gap-2">
           {(["all", "lost", "found"] as const).map((f) => (
-            <button
+            <Button
               key={f}
+              variant={filter === f ? "default" : "secondary"}
+              size="sm"
+              className="rounded-xl font-semibold"
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                filter === f
-                  ? "bg-primary text-primary-foreground shadow-soft"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              }`}
             >
               {f === "all" ? "🐾 All" : f === "lost" ? "🙀 Lost" : "😺 Found"}
-            </button>
+            </Button>
           ))}
         </div>
-        {user && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="px-5 py-2.5 rounded-xl bg-gradient-hero text-primary-foreground font-display font-bold shadow-soft hover:shadow-hover transition-all hover:-translate-y-0.5 inline-flex items-center gap-2"
-          >
-            <Plus size={18} /> Report a Cat
-          </button>
-        )}
-        {!user && (
+        {user ? (
+          <Dialog open={formOpen} onOpenChange={(o) => !o && resetForm()}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-hero text-primary-foreground shadow-soft font-display font-bold">
+                <Plus size={18} className="mr-1" /> Report a Cat
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {formType === "lost" ? "🙀 Report Lost Cat" : "😺 Report Found Cat"}
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="flex gap-2 mb-1">
+                {(["lost", "found"] as const).map((t) => (
+                  <Button
+                    key={t}
+                    variant={formType === t ? "default" : "secondary"}
+                    className="flex-1 rounded-xl text-sm font-semibold"
+                    onClick={() => setFormType(t)}
+                  >
+                    {t === "lost" ? "🙀 Lost" : "😺 Found"}
+                  </Button>
+                ))}
+              </div>
+
+              <form
+                onSubmit={(e) => { e.preventDefault(); reportMutation.mutate(); }}
+                className="grid gap-4"
+              >
+                <div className="grid gap-1.5">
+                  <Label>Cat's Name *</Label>
+                  <Input
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={formType === "lost" ? "What's your cat called?" : "Any name on the collar?"}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Breed, colour, distinguishing features..."
+                    rows={3}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Location *</Label>
+                  <Input
+                    required
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Where was the cat last seen?"
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Contact Info *</Label>
+                  <Input
+                    required
+                    value={contactInfo}
+                    onChange={(e) => setContactInfo(e.target.value)}
+                    placeholder="Phone number or email"
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Photo</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                    className="text-muted-foreground file:mr-3 file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={reportMutation.isPending}
+                  className="bg-gradient-hero text-primary-foreground font-display font-bold"
+                >
+                  {reportMutation.isPending ? "Submitting..." : "🐾 Submit Report"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        ) : (
           <p className="text-sm text-muted-foreground">
-            <a href="/auth" className="text-primary font-semibold hover:underline">Sign in</a> to file a report
+            <Link to="/auth" className="text-primary font-semibold hover:underline">Sign in</Link> to file a report
           </p>
         )}
       </div>
 
-      {/* Report Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-3xl border-2 border-border shadow-card w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 animate-fade-in-up">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-2xl font-bold text-foreground">
-                {formType === "lost" ? "🙀 Report Lost Cat" : "😺 Report Found Cat"}
-              </h2>
-              <button onClick={resetForm} className="p-2 rounded-lg hover:bg-secondary text-muted-foreground"><X size={20} /></button>
-            </div>
-
-            <div className="flex gap-2 mb-5">
-              {(["lost", "found"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setFormType(t)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    formType === t ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  {t === "lost" ? "🙀 Lost" : "😺 Found"}
-                </button>
-              ))}
-            </div>
-
-            <form
-              onSubmit={(e) => { e.preventDefault(); reportMutation.mutate(); }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-1">Cat's Name</label>
-                <input
-                  required value={name} onChange={(e) => setName(e.target.value)}
-                  placeholder={formType === "lost" ? "What's your cat called?" : "Any name on the collar?"}
-                  className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-1">Description</label>
-                <textarea
-                  value={description} onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Breed, colour, distinguishing features..."
-                  rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground resize-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-1">Location</label>
-                <input
-                  required value={location} onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Where was the cat last seen?"
-                  className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-1">Contact Info</label>
-                <input
-                  required value={contactInfo} onChange={(e) => setContactInfo(e.target.value)}
-                  placeholder="Phone number or email"
-                  className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-1">Photo</label>
-                <input
-                  type="file" accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                  className="w-full text-sm text-muted-foreground file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold file:cursor-pointer"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={reportMutation.isPending}
-                className="w-full py-3 rounded-xl bg-gradient-hero text-primary-foreground font-display font-bold shadow-soft hover:shadow-hover transition-all hover:-translate-y-0.5 disabled:opacity-50"
-              >
-                {reportMutation.isPending ? "Submitting..." : "🐾 Submit Report"}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Reports Grid */}
       {isLoading ? (
-        <div className="text-center py-16 text-muted-foreground">Loading reports...</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="overflow-hidden animate-pulse">
+              <div className="h-48 bg-muted rounded-t-lg" />
+              <CardContent className="p-5 space-y-2">
+                <div className="h-5 bg-muted rounded w-1/3" />
+                <div className="h-6 bg-muted rounded w-2/3" />
+                <div className="h-4 bg-muted rounded w-full" />
+                <div className="h-4 bg-muted rounded w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : reports.length === 0 ? (
         <div className="text-center py-16">
           <Search size={48} className="mx-auto text-muted-foreground/40 mb-4" />
@@ -232,21 +246,21 @@ const LostFound = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reports.map((report) => (
-            <div key={report.id} className="rounded-3xl bg-card border-2 border-border shadow-card overflow-hidden hover:shadow-hover transition-all hover:-translate-y-1">
+          {reports.map((report: any) => (
+            <Card key={report.id} className="overflow-hidden hover:shadow-hover transition-all hover:-translate-y-1">
               {report.image_url && (
-                <div className="aspect-video overflow-hidden">
+                <div className="aspect-video overflow-hidden bg-muted">
                   <img src={report.image_url} alt={report.name} className="w-full h-full object-cover" />
                 </div>
               )}
-              <div className="p-5">
+              <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold inline-flex items-center ${
                     report.type === "lost"
                       ? "bg-destructive/10 text-destructive"
                       : "bg-accent/10 text-accent"
                   }`}>
-                    {report.type === "lost" ? <><AlertTriangle size={12} className="inline mr-1" />LOST</> : <><Heart size={12} className="inline mr-1" />FOUND</>}
+                    {report.type === "lost" ? <><AlertTriangle size={12} className="mr-1" />LOST</> : <><Heart size={12} className="mr-1" />FOUND</>}
                   </span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground mb-1">{report.name}</h3>
@@ -262,15 +276,16 @@ const LostFound = () => {
                 <p className="text-sm font-medium text-foreground">📞 {report.contact_info}</p>
                 <ShareButtons title={`🐾 ${report.type === "lost" ? "Lost" : "Found"} cat: ${report.name}`} className="mt-2" />
                 {user && report.user_id === user.id && report.status === "active" && (
-                  <button
+                  <Button
+                    variant="secondary"
+                    className="mt-3 w-full rounded-xl text-sm font-bold bg-accent text-accent-foreground hover:bg-accent/90"
                     onClick={() => resolveMutation.mutate(report.id)}
-                    className="mt-3 w-full py-2 rounded-xl bg-accent text-accent-foreground text-sm font-bold hover:bg-accent/90 transition-all"
                   >
                     ✅ Mark as Resolved
-                  </button>
+                  </Button>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
