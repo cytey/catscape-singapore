@@ -4,6 +4,15 @@ import { useSEO } from "@/hooks/useSEO";
 import { getGuide, guides } from "@/data/guides";
 import ShareButtons from "@/components/ShareButtons";
 
+const guideImages: Record<string, string> = {
+  "purr-fect-diet": "https://images.pexels.com/photos/38151508/pexels-photo-38151508.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "cat-proofing-your-hdb": "https://images.pexels.com/photos/40061529/pexels-photo-40061529.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "vet-visit-purr-eparation": "https://images.pexels.com/photos/6900232/pexels-photo-6900232.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "fur-niture-rescue": "https://images.pexels.com/photos/33855553/pexels-photo-33855553.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "singapore-heat-purr-tection": "https://images.pexels.com/photos/4062842/pexels-photo-4062842.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "travelling-with-cats-in-sg": "https://images.pexels.com/photos/8437362/pexels-photo-8437362.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+};
+
 const GuideDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const guide = getGuide(slug);
@@ -44,7 +53,15 @@ const GuideDetail = () => {
 
       <div className="text-5xl mb-4">{guide.icon}</div>
       <h1 className="font-display text-4xl font-bold text-gradient-hero mb-3">{guide.title}</h1>
-      <p className="text-lg text-muted-foreground leading-relaxed mb-8">{guide.intro}</p>
+      <p className="text-lg text-muted-foreground leading-relaxed mb-6">{guide.intro}</p>
+
+      {guideImages[guide.slug] && (
+        <img
+          src={guideImages[guide.slug]}
+          alt={guide.title}
+          className="w-full h-64 md:h-80 object-cover rounded-3xl shadow-card mb-8"
+        />
+      )}
 
       <div className="space-y-8">
         {guide.sections.map((section) => (

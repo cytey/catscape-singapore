@@ -11,6 +11,15 @@ const tagColors: Record<string, string> = {
   Advisory: "bg-cat-gold/10 text-cat-gold",
 };
 
+const coverImages: Record<string, string> = {
+  "cat-fest-2026-bishan-park": "https://images.pexels.com/photos/26706493/pexels-photo-26706493.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "hdb-cat-friendly-policy-update": "https://images.pexels.com/photos/21047223/pexels-photo-21047223.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "free-tnr-clinic-tampines": "https://images.pexels.com/photos/11683916/pexels-photo-11683916.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "whiskers-void-deck-cat-viral": "https://images.pexels.com/photos/17138081/pexels-photo-17138081.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "neko-no-niwa-10-years": "https://images.pexels.com/photos/38189495/pexels-photo-38189495.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+  "monsoon-community-cat-shelters": "https://images.pexels.com/photos/31961534/pexels-photo-31961534.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+};
+
 const NewsDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const item = getNewsItem(slug);
@@ -57,6 +66,14 @@ const NewsDetail = () => {
         </span>
       </div>
       <h1 className="font-display text-3xl md:text-4xl font-bold text-gradient-hero mb-6">{item.title}</h1>
+
+      {coverImages[item.slug] && (
+        <img
+          src={coverImages[item.slug]}
+          alt={item.title}
+          className="w-full h-64 md:h-80 object-cover rounded-3xl shadow-card mb-8"
+        />
+      )}
 
       <div className="space-y-5">
         {item.body.map((paragraph, i) => (
