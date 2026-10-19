@@ -7,7 +7,19 @@
   <url><loc>https://catscape.sg/lost-found</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://catscape.sg/dictionary</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://catscape.sg/news</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://catscape.sg/news/hdb-cat-friendly-policy-update</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/news/cat-fest-2026-bishan-park</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/news/free-tnr-clinic-tampines</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/news/whiskers-void-deck-cat-viral</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/news/neko-no-niwa-10-years</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/news/monsoon-community-cat-shelters</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://catscape.sg/guides</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://catscape.sg/guides/purr-fect-diet</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/guides/cat-proofing-your-hdb</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/guides/vet-visit-purr-eparation</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/guides/fur-niture-rescue</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/guides/singapore-heat-purr-tection</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://catscape.sg/guides/travelling-with-cats-in-sg</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://catscape.sg/cat-verter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://catscape.sg/services</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://catscape.sg/store</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>

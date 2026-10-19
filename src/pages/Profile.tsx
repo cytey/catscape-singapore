@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, Loader2 } from "lucide-react";
+import { Camera, Save, Loader2, ClipboardList } from "lucide-react";
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -16,6 +16,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [myListings, setMyListings] = useState<{ id: string; name: string; status: string }[]>([]);
+  const [myReports, setMyReports] = useState<{ id: string; name: string; type: string }[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -39,6 +41,16 @@ const Profile = () => {
       setLoading(false);
     };
     fetchProfile();
+
+    const fetchMyPosts = async () => {
+      const [listingsRes, reportsRes] = await Promise.all([
+        supabase.from("adoption_listings").select("id, name, status").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("lost_found_cats").select("id, name, type").eq("user_id", user.id).order("created_at", { ascending: false }),
+      ]);
+      if (listingsRes.data) setMyListings(listingsRes.data);
+      if (reportsRes.data) setMyReports(reportsRes.data);
+    };
+    fetchMyPosts();
   }, [user]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,6 +191,53 @@ const Profile = () => {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? "Saving..." : "Save Changes 🐾"}
         </button>
+      </div>
+
+      {/* My Posts */}
+      <div className="mt-8 bg-card border-2 border-border rounded-2xl p-6 shadow-card">
+        <h2 className="font-display text-xl font-bold text-foreground mb-4 inline-flex items-center gap-2">
+          <ClipboardList size={20} className="text-primary" /> My Posts
+        </h2>
+
+        <div className="space-y-5">
+          <div>
+            <p className="text-sm font-semibold text-foreground mb-2">Adoption listings 🐾</p>
+            {myListings.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No listings yet — <Link to="/adoptions" className="text-primary font-semibold hover:underline">post one</Link>!
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {myListings.map((listing) => (
+                  <li key={listing.id} className="flex items-center justify-between gap-2 text-sm">
+                    <Link to="/adoptions" className="text-foreground hover:text-primary transition-colors">🐱 {listing.name}</Link>
+                    <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">{listing.status}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-foreground mb-2">Lost & Found reports 🔍</p>
+            {myReports.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No reports yet — <Link to="/lost-found" className="text-primary font-semibold hover:underline">file one</Link>!
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {myReports.map((report) => (
+                  <li key={report.id} className="flex items-center justify-between gap-2 text-sm">
+                    <Link to="/lost-found" className="text-foreground hover:text-primary transition-colors">
+                      {report.type === "lost" ? "🙀" : "😺"} {report.name}
+                    </Link>
+                    <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">{report.type}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
