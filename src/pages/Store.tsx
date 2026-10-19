@@ -29,10 +29,20 @@ const Store = () => {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12"><p className="text-4xl animate-paw-bounce">🛍️</p><p className="text-muted-foreground mt-2">Loading meow-chandise...</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card animate-pulse">
+              <div className="w-full h-40 rounded-xl bg-muted mb-4" />
+              <div className="h-5 bg-muted rounded w-2/3 mb-2" />
+              <div className="h-4 bg-muted rounded w-1/3 mb-3" />
+              <div className="h-4 bg-muted rounded w-full mb-2" />
+              <div className="h-8 bg-muted rounded w-full" />
+            </div>
+          ))}
+        </div>
       ) : products.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-4xl mb-3">🐱</p>
+          <p className="text-4xl mb-3 animate-paw-bounce">🐱</p>
           <p className="text-muted-foreground font-display text-lg">New products coming soon! Stay paw-sitive!</p>
           <p className="text-muted-foreground text-sm mt-2">Add products via the Cloud database to see them here.</p>
         </div>

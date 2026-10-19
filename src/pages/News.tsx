@@ -24,6 +24,7 @@ const News = () => {
         <p className="text-muted-foreground max-w-md mx-auto">
           Stay in the mew-s! All the latest cat-tivities, events, and feline news from Singapore.
         </p>
+        <p className="text-primary/40 text-2xl mt-4 tracking-[0.5em]">🐾 🐾 🐾</p>
       </div>
 
       <div className="max-w-3xl mx-auto space-y-4">

@@ -17,6 +17,7 @@ const Guides = () => {
         <p className="text-muted-foreground max-w-md mx-auto">
           Be-fur you scroll, know this: these guides will make you the most claw-ver cat purr-ent in Singapore!
         </p>
+        <p className="text-primary/40 text-2xl mt-4 tracking-[0.5em]">🐾 🐾 🐾</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">

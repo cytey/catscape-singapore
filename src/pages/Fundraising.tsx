@@ -131,12 +131,19 @@ const Fundraising = () => {
           <div className="space-y-4">
             {campaigns.map((campaign) => {
               const progress = campaign.goal_amount > 0 ? (Number(campaign.current_amount) / Number(campaign.goal_amount)) * 100 : 0;
+              const reached = progress >= 100;
               return (
                 <div key={campaign.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card">
-                  <h3 className="font-display font-bold text-foreground mb-2">{campaign.title}</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-display font-bold text-foreground">{campaign.title}</h3>
+                    {reached && <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-semibold">🎉 Goal reached!</span>}
+                  </div>
                   <p className="text-sm text-muted-foreground mb-3">{campaign.description}</p>
-                  <div className="w-full bg-secondary rounded-full h-3 mb-2">
-                    <div className="bg-gradient-hero h-3 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+                  <div className="w-full bg-secondary rounded-full h-3 mb-2 overflow-hidden">
+                    <div
+                      className={`h-3 rounded-full transition-all ${reached ? "bg-accent" : "bg-gradient-hero"}`}
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    />
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">${Number(campaign.current_amount).toLocaleString()} raised</span>

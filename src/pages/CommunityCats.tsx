@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { MapPin, Clock, Plus, Upload } from "lucide-react";
+import { Link } from "react-router-dom";
+import { MapPin, Clock, Plus, Upload, Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDistanceToNow } from "date-fns";
 import { useSEO } from "@/hooks/useSEO";
 
@@ -86,7 +93,11 @@ const CommunityCats = () => {
       }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["community-cats"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-cats"] });
+      toast({ title: "Paw-job well done! 🐾", description: "Status updated." });
+    },
+    onError: (err: any) => toast({ title: "Cat-astrophe! 😿", description: err.message, variant: "destructive" }),
   });
 
   const filtered = filter ? cats.filter((c) => c.status === filter) : cats;
@@ -103,120 +114,167 @@ const CommunityCats = () => {
       {/* Add Cat Button */}
       {user && (
         <div className="text-center mb-8">
-          <button
+          <Button
             onClick={() => setShowForm(!showForm)}
-            className="px-6 py-3 rounded-xl bg-gradient-hero text-primary-foreground font-display font-bold shadow-soft hover:shadow-hover transition-all hover:-translate-y-0.5 inline-flex items-center gap-2"
+            className="bg-gradient-hero text-primary-foreground font-display font-bold shadow-soft hover:shadow-hover transition-all hover:-translate-y-0.5"
           >
-            <Plus size={20} /> Add a Community Cat 🐾
-          </button>
+            <Plus size={20} className="mr-1" /> Add a Community Cat 🐾
+          </Button>
         </div>
       )}
 
       {/* Add Cat Form */}
       {showForm && (
-        <div className="max-w-md mx-auto mb-10 p-6 rounded-2xl bg-card border-2 border-border shadow-card animate-fade-in-up">
-          <h3 className="font-display text-lg font-bold text-foreground mb-4">Register a New Fur-riend!</h3>
-          <div className="space-y-3">
-            <input
-              placeholder="Cat's name..."
-              value={newCat.name}
-              onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none font-body text-foreground placeholder:text-muted-foreground"
-            />
-            <input
-              placeholder="Location (e.g. Tampines Blk 201)"
-              value={newCat.location}
-              onChange={(e) => setNewCat({ ...newCat, location: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none font-body text-foreground placeholder:text-muted-foreground"
-            />
-            <select
-              value={newCat.status}
-              onChange={(e) => setNewCat({ ...newCat, status: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none font-body text-foreground"
-            >
-              <option value="fed">😸 Fed & Happy</option>
-              <option value="hungry">😿 Hungry</option>
-              <option value="needs-help">🆘 Needs Help</option>
-            </select>
-            <textarea
-              placeholder="Notes about this fur-ball..."
-              value={newCat.notes}
-              onChange={(e) => setNewCat({ ...newCat, notes: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:outline-none font-body text-foreground placeholder:text-muted-foreground resize-none"
-              rows={3}
-            />
-            <label className="flex items-center gap-2 px-4 py-3 rounded-xl bg-background border-2 border-dashed border-border cursor-pointer hover:border-primary transition-colors">
-              <Upload size={20} className="text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{imageFile ? imageFile.name : "Upload a photo of the cat..."}</span>
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
-            </label>
-            <button
-              onClick={() => addCatMutation.mutate()}
-              disabled={!newCat.name || !newCat.location || addCatMutation.isPending}
-              className="w-full py-3 rounded-xl bg-gradient-hero text-primary-foreground font-display font-bold shadow-soft hover:shadow-hover transition-all disabled:opacity-50"
-            >
-              {addCatMutation.isPending ? "Adding..." : "🐾 Register Cat"}
-            </button>
-          </div>
-        </div>
+        <Card className="max-w-md mx-auto mb-10 shadow-card animate-fade-in-up">
+          <CardContent className="p-6">
+            <h3 className="font-display text-lg font-bold text-foreground mb-4">Register a New Fur-riend!</h3>
+            <div className="space-y-3">
+              <div className="grid gap-1.5">
+                <Label>Cat's name *</Label>
+                <Input
+                  value={newCat.name}
+                  onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
+                  placeholder="Cat's name..."
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Location *</Label>
+                <Input
+                  value={newCat.location}
+                  onChange={(e) => setNewCat({ ...newCat, location: e.target.value })}
+                  placeholder="Location (e.g. Tampines Blk 201)"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Status</Label>
+                <Select value={newCat.status} onValueChange={(v) => setNewCat({ ...newCat, status: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fed">😸 Fed & Happy</SelectItem>
+                    <SelectItem value="hungry">😿 Hungry</SelectItem>
+                    <SelectItem value="needs-help">🆘 Needs Help</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Notes</Label>
+                <Textarea
+                  value={newCat.notes}
+                  onChange={(e) => setNewCat({ ...newCat, notes: e.target.value })}
+                  placeholder="Notes about this fur-ball..."
+                  rows={3}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Photo</Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  className="text-muted-foreground file:mr-3 file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold"
+                />
+              </div>
+              <Button
+                onClick={() => addCatMutation.mutate()}
+                disabled={!newCat.name || !newCat.location || addCatMutation.isPending}
+                className="w-full bg-gradient-hero text-primary-foreground font-display font-bold shadow-soft hover:shadow-hover"
+              >
+                {addCatMutation.isPending ? <Loader2 size={16} className="mr-1.5 animate-spin" /> : "🐾 Register Cat"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Filters */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
-        <button onClick={() => setFilter(null)} className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${!filter ? "bg-gradient-hero text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+        <Button
+          variant={filter === null ? "default" : "secondary"}
+          size="sm"
+          className="rounded-full font-semibold"
+          onClick={() => setFilter(null)}
+        >
           All Cats 🐾
-        </button>
+        </Button>
         {Object.entries(statusLabels).map(([key, label]) => (
-          <button key={key} onClick={() => setFilter(key)} className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${filter === key ? "bg-gradient-hero text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+          <Button
+            key={key}
+            variant={filter === key ? "default" : "secondary"}
+            size="sm"
+            className="rounded-full font-semibold"
+            onClick={() => setFilter(key)}
+          >
             {label}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Cat Cards */}
       {isLoading ? (
-        <div className="text-center py-12"><p className="text-4xl animate-paw-bounce">🐱</p><p className="text-muted-foreground mt-2">Loading fur-riends...</p></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="overflow-hidden animate-pulse">
+              <div className="h-40 bg-muted rounded-t-lg" />
+              <CardContent className="p-5 space-y-2">
+                <div className="h-5 bg-muted rounded w-1/2" />
+                <div className="h-4 bg-muted rounded w-2/3" />
+                <div className="h-4 bg-muted rounded w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12"><p className="text-4xl">😿</p><p className="text-muted-foreground mt-2">No cats found! Be the first to add one!</p></div>
+        <div className="text-center py-12">
+          <p className="text-4xl mb-3 animate-paw-bounce">😿</p>
+          <p className="text-muted-foreground font-display text-lg">No cats found! Be the first to add one!</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {filtered.map((cat) => (
-            <div key={cat.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card hover:shadow-hover transition-all">
+            <Card key={cat.id} className="overflow-hidden hover:shadow-hover hover:-translate-y-1 transition-all">
               {cat.image_url && (
-                <img src={cat.image_url} alt={cat.name} className="w-full h-40 object-cover rounded-xl mb-3" />
+                <img src={cat.image_url} alt={cat.name} className="w-full h-40 object-cover" />
               )}
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{cat.name}</h3>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin size={12} />{cat.location}
+              <CardContent className="p-5">
+                <h3 className="font-display text-lg font-bold text-foreground">{cat.name}</h3>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+                  <MapPin size={12} />{cat.location}
+                </div>
+                <div className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border mb-3 ${statusColors[cat.status as keyof typeof statusColors] || ""}`}>
+                  {statusLabels[cat.status as keyof typeof statusLabels] || cat.status}
+                </div>
+                {cat.last_fed && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+                    <Clock size={12} />Last fed: {formatDistanceToNow(new Date(cat.last_fed), { addSuffix: true })}
                   </div>
-                </div>
-              </div>
-              <div className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border mb-3 ${statusColors[cat.status as keyof typeof statusColors] || ""}`}>
-                {statusLabels[cat.status as keyof typeof statusLabels] || cat.status}
-              </div>
-              {cat.last_fed && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-                  <Clock size={12} />Last fed: {formatDistanceToNow(new Date(cat.last_fed), { addSuffix: true })}
-                </div>
-              )}
-              <p className="text-sm text-muted-foreground mb-3">{cat.notes}</p>
-              {user && cat.user_id === user.id && (
-                <div className="flex gap-2">
-                  {cat.status !== "fed" && (
-                    <button onClick={() => updateStatusMutation.mutate({ id: cat.id, status: "fed" })} className="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs font-semibold hover:bg-accent/20 transition-colors">
-                      Mark as Fed 😸
-                    </button>
-                  )}
-                  {cat.status !== "needs-help" && (
-                    <button onClick={() => updateStatusMutation.mutate({ id: cat.id, status: "needs-help" })} className="px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-semibold hover:bg-destructive/20 transition-colors">
-                      Needs Help 🆘
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+                <p className="text-sm text-muted-foreground mb-3">{cat.notes}</p>
+                {user && cat.user_id === user.id && (
+                  <div className="flex flex-wrap gap-2">
+                    {cat.status !== "fed" && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="text-xs font-semibold bg-accent/10 text-accent hover:bg-accent/20"
+                        onClick={() => updateStatusMutation.mutate({ id: cat.id, status: "fed" })}
+                      >
+                        Mark as Fed 😸
+                      </Button>
+                    )}
+                    {cat.status !== "needs-help" && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/20"
+                        onClick={() => updateStatusMutation.mutate({ id: cat.id, status: "needs-help" })}
+                      >
+                        Needs Help 🆘
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
@@ -224,7 +282,7 @@ const CommunityCats = () => {
       {!user && (
         <div className="text-center mt-12 p-6 rounded-2xl bg-secondary max-w-md mx-auto">
           <p className="text-muted-foreground text-sm">
-            🐾 <a href="/auth" className="text-primary font-semibold hover:underline">Sign in</a> to add and manage community cats!
+            🐾 <Link to="/auth" className="text-primary font-semibold hover:underline">Sign in</Link> to add and manage community cats!
           </p>
         </div>
       )}
