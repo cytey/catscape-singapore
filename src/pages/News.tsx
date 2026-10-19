@@ -30,70 +30,83 @@ const News = () => {
   const [lead, ...rest] = newsItems;
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="mb-10">
-        <h1 className="font-display text-4xl font-bold text-gradient-hero mb-2">📰 Cat-ch Up</h1>
-        <p className="text-muted-foreground max-w-md">
-          Stay in the mew-s! All the latest cat-tivities, events, and feline news from Singapore.
-        </p>
-        <p className="text-primary/40 text-2xl mt-4 tracking-[0.5em]">🐾 🐾 🐾</p>
-      </div>
+    <div>
+      {/* Page hero */}
+      <section className="bg-gradient-warm border-b border-border">
+        <div className="container mx-auto px-4 py-14 md:py-16">
+          <p className="eyebrow mb-3">Cat-ch Up</p>
+          <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground max-w-2xl">
+            Stay in the mew-s.
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-xl leading-relaxed">
+            Events, cat-tivities, and all things feline in Singapore.
+          </p>
+        </div>
+      </section>
 
-      {/* Lead story */}
-      {lead && (
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Link to={`/news/${lead.slug}`} className="group grid md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border-2 border-border shadow-card hover:shadow-hover transition-all mb-10">
-            <div className="relative h-64 md:h-auto overflow-hidden">
-              <img
-                src={coverImages[lead.slug]}
-                alt={lead.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <span className="absolute top-4 left-4 text-xs px-3 py-1 rounded-full bg-card/90 font-semibold text-primary">Latest</span>
-            </div>
-            <div className="p-6 md:p-8 bg-card flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-xs text-muted-foreground">{lead.date}</span>
-                <span className={`text-xs px-2 py-1 rounded-full font-semibold ${tagColors[lead.tag]}`}>{lead.tag}</span>
-              </div>
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">{lead.title}</h2>
-              <p className="text-muted-foreground leading-relaxed">{lead.desc}</p>
-              <p className="text-sm text-primary font-semibold mt-4">Read the full story →</p>
-            </div>
-          </Link>
-        </motion.div>
-      )}
-
-      {/* Compact rows */}
-      <div className="max-w-3xl space-y-3">
-        {rest.map((item, i) => (
-          <motion.div
-            key={item.slug}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.35, delay: i * 0.06 }}
-          >
+      <div className="container mx-auto px-4 py-12">
+        {/* Lead story */}
+        {lead && (
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <Link
-              to={`/news/${item.slug}`}
-              className="flex gap-4 p-4 rounded-2xl bg-card border-2 border-border shadow-card hover:shadow-hover hover:-translate-y-0.5 transition-all group"
+              to={`/news/${lead.slug}`}
+              className="group grid md:grid-cols-2 rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-hover transition-all mb-10"
             >
-              <img
-                src={coverImages[item.slug]}
-                alt=""
-                className="w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover shrink-0"
-              />
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs text-muted-foreground">{item.date}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${tagColors[item.tag]}`}>{item.tag}</span>
+              <div className="relative h-64 md:h-auto overflow-hidden bg-secondary">
+                <img
+                  src={coverImages[lead.slug]}
+                  alt={lead.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6 md:p-10 bg-card flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xs text-muted-foreground">{lead.date}</span>
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${tagColors[lead.tag]}`}>{lead.tag}</span>
                 </div>
-                <h3 className="font-display text-base md:text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{item.desc}</p>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3 leading-snug group-hover:text-primary transition-colors">
+                  {lead.title}
+                </h2>
+                <p className="text-muted-foreground leading-relaxed">{lead.desc}</p>
+                <p className="text-sm text-primary font-semibold mt-5">Read the full story →</p>
               </div>
             </Link>
           </motion.div>
-        ))}
+        )}
+
+        {/* Rest */}
+        <div className="max-w-3xl space-y-3">
+          {rest.map((item, i) => (
+            <motion.div
+              key={item.slug}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.35, delay: i * 0.06 }}
+            >
+              <Link
+                to={`/news/${item.slug}`}
+                className="flex gap-5 p-4 rounded-2xl bg-card border border-border shadow-card hover:shadow-hover hover:-translate-y-0.5 transition-all group"
+              >
+                <img
+                  src={coverImages[item.slug]}
+                  alt=""
+                  className="w-24 h-24 rounded-xl object-cover shrink-0"
+                />
+                <div className="min-w-0 py-0.5">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-xs text-muted-foreground">{item.date}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${tagColors[item.tag]}`}>{item.tag}</span>
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{item.desc}</p>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );

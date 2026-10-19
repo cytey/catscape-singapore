@@ -8,6 +8,7 @@ import {
   User,
   Sun,
   Moon,
+  Heart,
   ChevronDown,
 } from "lucide-react";
 import {
@@ -23,19 +24,19 @@ import { useTheme } from "@/hooks/useTheme";
 import catLogo from "@/assets/catscape-logo.png";
 
 const primaryItems = [
-  { path: "/fundraising", label: "Fundraising" },
   { path: "/adoptions", label: "Adopt" },
+  { path: "/fundraising", label: "Paw-Fund" },
   { path: "/news", label: "News" },
   { path: "/guides", label: "Guides" },
 ];
 
 const exploreItems = [
-  { path: "/store", label: "Store" },
-  { path: "/community-cats", label: "Community Cats" },
+  { path: "/community-cats", label: "Whisker Watch" },
   { path: "/lost-found", label: "Lost & Found" },
-  { path: "/dictionary", label: "Dictionary" },
+  { path: "/dictionary", label: "Meow-tionary" },
   { path: "/cat-verter", label: "Cat-verter" },
-  { path: "/services", label: "Vet & Services" },
+  { path: "/services", label: "Vets & Services" },
+  { path: "/store", label: "Store" },
 ];
 
 const allItems = [...primaryItems, ...exploreItems];
@@ -43,20 +44,20 @@ const allItems = [...primaryItems, ...exploreItems];
 const isActive = (pathname: string, current: string) =>
   current === pathname || (pathname !== "/" && current.startsWith(pathname));
 
-const NavLink = ({ to, children, onClick }: { to: string; children: React.ReactNode; onClick?: () => void }) => {
+const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
   const current = useLocation().pathname;
   const active = isActive(to, current);
   return (
     <Link
       to={to}
-      onClick={onClick}
-      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        active
-          ? "text-foreground bg-secondary"
-          : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+      className={`relative px-3 py-2 text-sm font-medium transition-colors ${
+        active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {children}
+      {active && (
+        <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary" aria-hidden="true" />
+      )}
     </Link>
   );
 };
@@ -70,29 +71,24 @@ const Navbar = () => {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/85 backdrop-blur-lg border-b border-border">
+    <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={catLogo} alt="CatScape" className="w-8 h-8" />
-            <span className="flex flex-col leading-tight">
-              <span className="font-display text-xl font-bold text-foreground">CatScape</span>
-              <span className="hidden sm:block text-[11px] text-muted-foreground">🐾 Singapore's cat community</span>
-            </span>
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src={catLogo} alt="CatScape" className="w-9 h-9" />
+            <span className="font-display text-xl font-bold text-foreground tracking-tight">CatScape</span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-0.5">
+          <div className="hidden lg:flex items-center gap-1">
             {primaryItems.map((item) => (
               <NavLink key={item.path} to={item.path}>
                 {item.label}
               </NavLink>
             ))}
             <DropdownMenu>
-              <DropdownMenuTrigger className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors focus:outline-none">
-                <span className="inline-flex items-center gap-1">
-                  Explore <ChevronDown size={14} />
-                </span>
+              <DropdownMenuTrigger className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none inline-flex items-center gap-1">
+                Explore <ChevronDown size={14} />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-52">
                 <DropdownMenuLabel>More features</DropdownMenuLabel>
@@ -104,45 +100,55 @@ const Navbar = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
 
-            <div className="ml-3 flex items-center gap-1">
-              {user ? (
-                <>
-                  <Link
-                    to="/profile"
-                    className={`p-2 rounded-lg transition-colors inline-flex items-center ${
-                      isActive("/profile", pathname)
-                        ? "text-foreground bg-secondary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
-                    }`}
-                    aria-label="Profile"
-                    title="Profile"
-                  >
-                    <User size={18} />
-                  </Link>
-                  <button
-                    onClick={() => signOut()}
-                    className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors inline-flex items-center gap-1.5"
-                  >
-                    <LogOut size={16} /> Sign Out
-                  </button>
-                </>
-              ) : (
+          <div className="hidden lg:flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            {user ? (
+              <>
                 <Link
-                  to="/auth"
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
+                  to="/profile"
+                  className={`p-2 rounded-lg transition-colors inline-flex items-center ${
+                    isActive("/profile", pathname)
+                      ? "text-primary bg-secondary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                  }`}
+                  aria-label="Profile"
+                  title="Profile"
                 >
-                  <LogIn size={16} /> Sign In
+                  <User size={18} />
                 </Link>
-              )}
-              <button
-                onClick={toggleTheme}
+                <button
+                  onClick={() => signOut()}
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+                  aria-label="Sign out"
+                  title="Sign out"
+                >
+                  <LogOut size={18} />
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/auth"
                 className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
-                aria-label="Toggle theme"
+                aria-label="Sign in"
+                title="Sign in"
               >
-                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-            </div>
+                <LogIn size={18} />
+              </Link>
+            )}
+            <Link
+              to="/fundraising"
+              className="ml-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold shadow-soft hover:shadow-hover hover:-translate-y-0.5 transition-all"
+            >
+              <Heart size={15} /> Donate
+            </Link>
           </div>
 
           {/* Mobile toggle */}
@@ -154,6 +160,13 @@ const Navbar = () => {
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
+            <Link
+              to="/fundraising"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
+            >
+              <Heart size={15} />
+              <span className="hidden sm:inline">Donate</span>
+            </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-lg text-muted-foreground hover:bg-secondary/60"
@@ -167,7 +180,7 @@ const Navbar = () => {
         {/* Mobile nav */}
         {isOpen && (
           <div className="lg:hidden pb-4 animate-fade-in-up">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5">
               {allItems.map((item) => (
                 <Link
                   key={item.path}
@@ -182,31 +195,33 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              {user ? (
-                <>
+              <div className="mt-2 pt-2 border-t border-border">
+                {user ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={closeMenu}
+                      className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors inline-flex items-center gap-2"
+                    >
+                      <User size={16} /> Profile
+                    </Link>
+                    <button
+                      onClick={() => { signOut(); closeMenu(); }}
+                      className="w-full px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors text-left inline-flex items-center gap-2"
+                    >
+                      <LogOut size={16} /> Sign Out
+                    </button>
+                  </>
+                ) : (
                   <Link
-                    to="/profile"
+                    to="/auth"
                     onClick={closeMenu}
-                    className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors inline-flex items-center gap-2"
+                    className="px-4 py-3 rounded-lg border border-border text-sm font-semibold text-foreground text-center inline-flex items-center justify-center gap-2"
                   >
-                    <User size={16} /> Profile
+                    <LogIn size={16} /> Sign In / Join
                   </Link>
-                  <button
-                    onClick={() => { signOut(); closeMenu(); }}
-                    className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors text-left inline-flex items-center gap-2"
-                  >
-                    <LogOut size={16} /> Sign Out
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/auth"
-                  onClick={closeMenu}
-                  className="px-4 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold text-center"
-                >
-                  Sign In / Join
-                </Link>
-              )}
+                )}
+              </div>
             </div>
           </div>
         )}

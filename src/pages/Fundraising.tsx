@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, Mail, Loader2 } from "lucide-react";
+import { Heart, Mail, Loader2, Target, HandCoins, Wallet } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSEO } from "@/hooks/useSEO";
@@ -43,7 +43,6 @@ const Fundraising = () => {
         .from("paw_date_subscribers")
         .insert({ email: email.trim().toLowerCase() });
       if (error) {
-        // Unique violation means already subscribed — treat as success
         if ((error as { code?: string }).code === "23505") return;
         throw error;
       }
@@ -54,129 +53,167 @@ const Fundraising = () => {
     },
   });
 
+  const stats = [
+    { icon: HandCoins, value: `$${totalRaised.toLocaleString()}`, label: "Total raised" },
+    { icon: Target, value: `$${totalGoal.toLocaleString()}`, label: "Combined goal" },
+    { icon: Wallet, value: `$${(totalRaised - totalSpent).toLocaleString()}`, label: "Available funds" },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-10">
-        <h1 className="font-display text-4xl font-bold text-gradient-hero mb-3">💰 Paw-Fund</h1>
-        <p className="text-muted-foreground max-w-md mx-auto">
-          Every purr-ny counts! Help us care for Singapore's community cats and fur-babies in need.
-        </p>
-      </div>
+    <div>
+      {/* Page hero */}
+      <section className="relative bg-gradient-warm border-b border-border overflow-hidden">
+        <div className="paw-pattern absolute inset-0" aria-hidden="true" />
+        <div className="relative container mx-auto px-4 py-14 md:py-20">
+          <p className="eyebrow mb-3">CatScape Paw-Fund</p>
+          <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground max-w-2xl">
+            Every purr-ny counts.
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-xl leading-relaxed">
+            Donations go directly to community cat care, TNR programmes, and emergency
+            vet bills — with every dollar accounted for below.
+          </p>
+        </div>
+      </section>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
-        <div className="p-6 rounded-2xl bg-card border-2 border-primary/20 shadow-card text-center">
-          <p className="text-3xl font-display font-bold text-gradient-hero">${totalRaised.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground mt-1">Total Fur-nds Raised</p>
+      <section className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
+          {stats.map((s) => (
+            <div key={s.label} className="p-6 rounded-2xl bg-card border border-border shadow-card text-center">
+              <s.icon className="mx-auto mb-3 text-primary" size={24} />
+              <p className="font-display text-3xl font-bold text-foreground">{s.value}</p>
+              <p className="text-sm text-muted-foreground mt-1">{s.label}</p>
+            </div>
+          ))}
         </div>
-        <div className="p-6 rounded-2xl bg-card border-2 border-accent/20 shadow-card text-center">
-          <p className="text-3xl font-display font-bold text-accent">${totalSpent.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground mt-1">Spent on Cat Care</p>
-        </div>
-        <div className="p-6 rounded-2xl bg-card border-2 border-cat-gold/20 shadow-card text-center">
-          <p className="text-3xl font-display font-bold text-cat-gold">${(totalRaised - totalSpent).toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground mt-1">Available Fur-nds</p>
-        </div>
-      </div>
+      </section>
 
-      {/* Donate */}
-      <div className="max-w-md mx-auto mb-12">
-        <div className="p-8 rounded-3xl bg-gradient-hero shadow-hover text-center">
-          <Heart className="mx-auto mb-4 text-primary-foreground" size={40} />
-          <h2 className="font-display text-2xl font-bold text-primary-foreground mb-4">Donate Meow!</h2>
-          <p className="text-primary-foreground/70 text-sm">Payment integration coming soon! Contact us to donate directly. 🐾</p>
-        </div>
-      </div>
-
-      {/* Email updates */}
-      <div className="max-w-md mx-auto mb-12">
-        <div className="p-8 rounded-3xl bg-card border-2 border-accent/25 shadow-card text-center">
-          <Mail className="mx-auto mb-3 text-accent" size={32} />
-          <h2 className="font-display text-xl font-bold text-foreground mb-2">Get Paw-date Updates 📬</h2>
-          <p className="text-muted-foreground text-sm mb-4">
-            Be the first to know about new campaigns, cat care milestones and community cat news.
-          </p>
-          {subscribed ? (
-            <p className="text-accent font-semibold text-sm">😸 You're on the list! Watch your inbox for paw-dates.</p>
-          ) : (
-            <form
-              onSubmit={(e) => { e.preventDefault(); subscribeMutation.mutate(); }}
-              className="flex flex-col sm:flex-row gap-2"
-            >
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@catscape.sg"
-                className="flex-1 px-4 py-2.5 rounded-xl bg-background border-2 border-border focus:border-accent focus:outline-none text-foreground placeholder:text-muted-foreground text-sm"
-              />
-              <button
-                type="submit"
-                disabled={subscribeMutation.isPending}
-                className="px-5 py-2.5 rounded-xl bg-gradient-hero text-primary-foreground font-display font-bold text-sm shadow-soft hover:shadow-hover transition-all disabled:opacity-60 inline-flex items-center justify-center gap-1.5"
-              >
-                {subscribeMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
-                Subscribe
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-
-      {/* Active Campaigns */}
+      {/* Campaigns */}
       {campaigns.length > 0 && (
-        <div className="max-w-2xl mx-auto mb-12">
-          <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">🎯 Active Campaigns</h2>
-          <div className="space-y-4">
-            {campaigns.map((campaign) => {
-              const progress = campaign.goal_amount > 0 ? (Number(campaign.current_amount) / Number(campaign.goal_amount)) * 100 : 0;
-              const reached = progress >= 100;
-              return (
-                <div key={campaign.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-display font-bold text-foreground">{campaign.title}</h3>
-                    {reached && <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-semibold">🎉 Goal reached!</span>}
+        <section className="container mx-auto px-4 pb-12">
+          <div className="max-w-3xl mx-auto">
+            <div className="mb-6">
+              <p className="eyebrow mb-2">Where the money goes</p>
+              <h2 className="font-display text-3xl font-bold text-foreground">Active campaigns</h2>
+            </div>
+            <div className="space-y-5">
+              {campaigns.map((campaign) => {
+                const progress = campaign.goal_amount > 0 ? (Number(campaign.current_amount) / Number(campaign.goal_amount)) * 100 : 0;
+                const reached = progress >= 100;
+                return (
+                  <div key={campaign.id} className="p-6 md:p-7 rounded-2xl bg-card border border-border shadow-card">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="font-display text-xl font-bold text-foreground">{campaign.title}</h3>
+                      {reached && (
+                        <span className="shrink-0 text-xs px-2.5 py-1 rounded-full bg-accent/10 text-accent font-semibold">
+                          Goal reached
+                        </span>
+                      )}
+                    </div>
+                    {campaign.description && (
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">{campaign.description}</p>
+                    )}
+                    <div className="w-full bg-secondary rounded-full h-2.5 mb-2.5 overflow-hidden">
+                      <div
+                        className={`h-2.5 rounded-full transition-all ${reached ? "bg-accent" : "bg-gradient-hero"}`}
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="font-semibold text-foreground">
+                        ${Number(campaign.current_amount).toLocaleString()} raised
+                      </span>
+                      <span className="text-muted-foreground">
+                        ${Number(campaign.goal_amount).toLocaleString()} goal
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">{campaign.description}</p>
-                  <div className="w-full bg-secondary rounded-full h-3 mb-2 overflow-hidden">
-                    <div
-                      className={`h-3 rounded-full transition-all ${reached ? "bg-accent" : "bg-gradient-hero"}`}
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">${Number(campaign.current_amount).toLocaleString()} raised</span>
-                    <span className="font-semibold text-foreground">${Number(campaign.goal_amount).toLocaleString()} goal</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Donate + newsletter */}
+      <section className="container mx-auto px-4 pb-16">
+        <div className="max-w-3xl mx-auto grid gap-6 md:grid-cols-2">
+          <div className="relative overflow-hidden bg-gradient-hero rounded-2xl p-8 text-center shadow-hover">
+            <Heart className="mx-auto mb-4 text-primary-foreground" size={36} />
+            <h2 className="font-display text-2xl font-bold text-primary-foreground mb-2">Donate today</h2>
+            <p className="text-primary-foreground/80 text-sm leading-relaxed">
+              Online payments are coming soon. In the meantime, reach out and we'll
+              help you contribute directly.
+            </p>
+          </div>
+          <div className="p-8 rounded-2xl bg-card border border-border shadow-card text-center">
+            <Mail className="mx-auto mb-4 text-primary" size={32} />
+            <h2 className="font-display text-xl font-bold text-foreground mb-2">Get paw-date updates</h2>
+            <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+              New campaigns, care milestones and community cat news — straight to your inbox.
+            </p>
+            {subscribed ? (
+              <p className="text-accent font-semibold text-sm">You're on the list! Watch your inbox.</p>
+            ) : (
+              <form
+                onSubmit={(e) => { e.preventDefault(); subscribeMutation.mutate(); }}
+                className="flex flex-col gap-2"
+              >
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.sg"
+                  className="px-4 py-2.5 rounded-lg bg-background border border-border focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground text-sm"
+                />
+                <button
+                  type="submit"
+                  disabled={subscribeMutation.isPending}
+                  className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm shadow-soft hover:shadow-hover transition-all disabled:opacity-60 inline-flex items-center justify-center gap-1.5"
+                >
+                  {subscribeMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+                  Subscribe
+                </button>
+              </form>
+            )}
           </div>
         </div>
-      )}
+      </section>
 
       {/* Updates */}
       {updates.length > 0 && (
-        <div className="max-w-2xl mx-auto">
-          <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">📋 Fur-nd Usage Updates</h2>
-          <div className="space-y-4">
-            {updates.map((update) => (
-              <div key={update.id} className="p-6 rounded-2xl bg-card border-2 border-border shadow-card">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-display font-bold text-foreground">{update.title}</span>
-                  {update.amount_used && <span className="text-cat-rose font-semibold text-sm">-${Number(update.amount_used).toLocaleString()}</span>}
+        <section className="container mx-auto px-4 pb-20">
+          <div className="max-w-3xl mx-auto">
+            <div className="mb-6">
+              <p className="eyebrow mb-2">Transparency</p>
+              <h2 className="font-display text-3xl font-bold text-foreground">Fund usage updates</h2>
+            </div>
+            <div className="space-y-4">
+              {updates.map((update) => (
+                <div key={update.id} className="p-6 rounded-2xl bg-card border border-border shadow-card">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="font-display text-lg font-bold text-foreground">{update.title}</h3>
+                    {update.amount_used != null && (
+                      <span className="shrink-0 font-semibold text-sm text-destructive">
+                        -${Number(update.amount_used).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  {update.description && (
+                    <p className="text-sm text-muted-foreground leading-relaxed">{update.description}</p>
+                  )}
                 </div>
-                <p className="text-sm text-muted-foreground">{update.description}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {campaigns.length === 0 && updates.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">No campaigns yet. Add them via the Cloud database! 🐾</p>
+        <div className="container mx-auto px-4 pb-24 text-center">
+          <p className="text-muted-foreground">No campaigns yet — check back soon.</p>
         </div>
       )}
     </div>
