@@ -75,7 +75,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
             <img src={catLogo} alt="CatScape" className="w-8 h-8" />
-            <span className="font-display text-xl font-bold text-foreground">CatScape</span>
+            <span className="flex flex-col leading-tight">
+              <span className="font-display text-xl font-bold text-foreground">CatScape</span>
+              <span className="hidden sm:block text-[11px] text-muted-foreground">🐾 Singapore's cat community</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}

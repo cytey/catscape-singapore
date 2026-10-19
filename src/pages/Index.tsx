@@ -52,8 +52,9 @@ const Index = () => {
               </span>
             </h1>
             <p className="text-lg text-foreground/80 mb-8 max-w-lg">
-              The one-stop paw-tal for every cat lover in the Lion City. 
-              From fur-ndraising to fur-ster care — we've got every whisker covered!
+              The one-stop paw-tal for every cat lover in the Lion City —
+              powered by neighbours like you. From fur-ndraising to fur-ster care,
+              we've got every whisker covered!
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
@@ -73,6 +74,48 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Community band */}
+      <section className="container mx-auto px-4 pb-4 pt-2">
+        <div className="rounded-3xl overflow-hidden shadow-card border-2 border-border">
+          <div className="grid md:grid-cols-3">
+            <div className="relative h-56 md:h-auto md:col-span-1">
+              <img
+                src="https://images.pexels.com/photos/19981617/pexels-photo-19981617.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+                alt="Community cats sunbathing together on a bench"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="relative h-56 md:h-auto md:col-span-1">
+              <img
+                src="https://images.pexels.com/photos/36963957/pexels-photo-36963957.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+                alt="A person holding their cat"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="relative h-56 md:h-auto md:col-span-1">
+              <img
+                src="https://images.pexels.com/photos/11683916/pexels-photo-11683916.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+                alt="Cats sharing a meal at a feeding station"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          {[
+            { value: "89,000+", label: "community cats in Singapore 🐈" },
+            { value: "600+", label: "feeding stations island-wide 🍽️" },
+            { value: "1,200+", label: "kitties rehomed every year 🏡" },
+            { value: "24/7", label: "whisker watchers on patrol 🌙" },
+          ].map((s) => (
+            <div key={s.label} className="text-center rounded-2xl bg-card border-2 border-border shadow-card p-4">
+              <p className="font-display text-2xl font-bold text-primary">{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
@@ -80,7 +123,7 @@ const Index = () => {
             Our Claw-some Fur-tures 🐾
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Everything a cat purr-ent needs, all in one paw-some app!
+            Everything a cat purr-ent needs, all in one paw-some app — built by the community, for the clowder!
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
